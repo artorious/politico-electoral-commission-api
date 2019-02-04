@@ -12,3 +12,6 @@ services:
 
 script:
     - coverage run --source app/tests/ -m pytest
+
+after_success:
+    - coveralls
