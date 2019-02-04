@@ -10,4 +10,12 @@ class DevelopmentConfig(BaseConfig):
     """ Development mode configurations """
     DEBUG = True
 
-app_config = {"development": DevelopmentConfig}
+class TestingConfig(BaseConfig):
+    """ Testing mode configurations """
+    DEBUG = True
+    TESTING = True
+
+app_config = {
+    "development": DevelopmentConfig,
+    "testing": TestingConfig
+    }

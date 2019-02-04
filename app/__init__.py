@@ -8,6 +8,8 @@ def create_app(config_mode):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_mode])
     app.config.from_pyfile('config.py')
+    from app.api.v1 import party_views
+    app.register_blueprint(party_views.base_bp_v1)
     return app
     
 
