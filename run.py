@@ -1,8 +1,10 @@
 #!/usr.bin/env python3
 """ Runner"""
-from flask import Flask
+import os
+from app import create_app
 
-app = Flask(__name__, instance_relative_config=True)
+config_mode = os.getenv("APP_SETTINGS")
+app = create_app(config_mode)
 
 if __name__ == "__main__":
-    app.run(DEBUG=True)
+    app.run()
