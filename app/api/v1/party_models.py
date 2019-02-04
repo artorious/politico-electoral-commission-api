@@ -77,3 +77,8 @@ class PoliticalParties:
         else:
             custom_msg = False
         return custom_msg
+
+    def get_all_parties(self):
+        """ Fetch all parties """
+
+        pass

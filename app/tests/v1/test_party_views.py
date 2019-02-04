@@ -152,5 +152,23 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
+    def test_message_is_fetched_succesfully(self):
+        # Status 200
+        # data
+        # Create a party
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+        response = self.client().get("/api/v1/parties")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["status"], "Success")
+
+
 if __name__ == "__main__":
     unittest.main()
