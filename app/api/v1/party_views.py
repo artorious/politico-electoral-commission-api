@@ -18,24 +18,30 @@ def parties():
         sample_party = PoliticalParties(party_reg_data)
         if len(party_reg_data) > 4:
             custom_response = jsonify({
-                "status": "Bad Query",
-                "error": "More data fields than expected"
+                "status": 400,
+                "error": "Bad Query - More data fields than expected"
             }), 400
         elif len(party_reg_data) < 4:
             custom_response = jsonify({
-                "status": "Bad Query",
-                "error": "Fewer data fields than expected"
+                "status": 400,
+                "error": "Bad Query - Fewer data fields than expected"
             }), 400
         elif sample_party.check_for_expected_value_types() is False:
             custom_response = jsonify({
-                "status": "Unprocessable Entity",
-                "error": "Invalid value in data field"
+                "status": 422,
+                "error": "Unprocessable Entity - Invalid value in data field"
             }), 422
         elif sample_party.check_for_any_empty_fields() is False:
             custom_response = jsonify({
-                "status": "Unprocessable Entity",
+                "status": 422,
                 "error": "Empty data field"
             }), 422
+        elif sample_party.check_whether_party_exists(
+                party_reg_data["name"]) is True:
+            custom_response = jsonify({
+                "status": 409,
+                "error": "Conflict - Party already exists"
+            }), 409
         else:
             custom_response = jsonify(sample_party.create_party()), 201
 
@@ -48,39 +54,32 @@ def parties():
     return custom_response
 
 
-
-
-@BASE_BP_V1.route("/parties/<int:id>", methods=["GET"])
-def party(id):
+@BASE_BP_V1.route("/parties/<int:pid>", methods=["GET"])
+def party(pid):
     """
     GET -> Fetch political party by ID
     """
     custom_response = None
-    if request.method == "GET":
-        # TODO:
-        # Check if interger and not empty : 400 ????
-            # {
-                # "status": "integer",
-                # "error": "String: relevant-error-message"
-            # }
-        # Check if float: 400
-            # {
-                # "status": "integer",
-                # "error": "String: relevant-error-message"
-            # }
-        # check if its less than 1 : 400
-            # {
-                # "status": "integer",
-                # "error": "String: relevant-error-message"
-            # }
-        # call model with id
 
-        pass
+    if request.method == "GET":
+
+        if isinstance(pid, int) and pid >= 1:
+            if PoliticalParties.check_id_exists(pid) is True:
+                custom_response = jsonify({
+                    "status": 200,
+                    "data": PoliticalParties.fetch_a_party(pid)
+                }), 200
+            else:
+                custom_response = jsonify({
+                    "status": 416,
+                    "error": "ID out of range. Requested Range Not Satisfiable"
+                }), 416
+        elif pid < 1:
+            custom_response = jsonify({
+                "status": "Failed",
+                "error": "ID cannot be zero or negative"
+            }), 400
     else:
         pass
 
-
     return custom_response
-
-
-

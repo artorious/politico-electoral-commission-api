@@ -70,17 +70,13 @@ class TestPolticalParties(unittest.TestCase):
     def test_create_party_method_returns_a_custom_message(self):
         """ Test a political prty is created"""
         self.assertDictEqual(
-            {'status': 'success', 'data': [{'id': 1, 'name': 'Jubilee'}]},
+            {'status': 201, 'data': [{'id': 1, 'name': 'Jubilee'}]},
             self.test_data.create_party()
         )
 
     def test_creating_a_party_twice_is_caught_and_handled(self):
         """ Test a political pary cannot be created twice """
-        self.test_data.create_party()
-        self.assertDictEqual(
-            self.test_data.create_party(),
-            {'status': 'Failed', 'error': 'Party already exists'}
-        )
+        self.assertTrue(self.test_data.check_whether_party_exists("Jubilee"))
 
     def test_fetching_all_parties_returns_data(self):
         """ Test that a dictionary holding the data is returned """
@@ -89,15 +85,11 @@ class TestPolticalParties(unittest.TestCase):
     def test_that_id_look_up_is_done_before_fetching(self):
         """ Test that method checks that the id value exists"""
         # try ferching an obnoxious no.
-        self.assertDictEqual(
-            {"status": "Failed", "error": "String: relevant-error-message"},
-            self.test_data.fetch_a_party(1000000),
-            msg=" Expected error message"
-        )
+        self.assertFalse(self.test_data.check_id_exists(1000000000000))
 
     def test_fetching_a_party_by_id_returns_data(self):
         """ Test method returns data"""
-        self.assertIsInstance(self.test_data.fetch_a_party(1), dict)
+        self.assertIsInstance(self.test_data.fetch_a_party(1), list)
 
 
 if __name__ == "__main__":

@@ -27,10 +27,11 @@ class TestPartiesRoute(unittest.TestCase):
             headers={'content-type': 'application/json'}
         )
         self.assertEqual(
-            response.status_code, 201,
+            response.status_code, 409,
             msg="response code SHOULD BE 201 (Created)"
         )
-        response_in_json = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        response_in_json = json.loads(
+            response.data.decode('utf-8').replace("'", "\""))
         self.assertIn("status", response_in_json)
 
     def test_party_creation_with_more_fields_than_expected(self):
@@ -54,7 +55,8 @@ class TestPartiesRoute(unittest.TestCase):
             msg="response code SHOULD BE 400 (bad query) + msg"
         )
         self.assertEqual(
-            deserialized_response["error"], "More data fields than expected",
+            deserialized_response["error"],
+            "Bad Query - More data fields than expected",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -77,7 +79,8 @@ class TestPartiesRoute(unittest.TestCase):
             msg="response code SHOULD BE 400 (bad query) + msg"
         )
         self.assertEqual(
-            deserialized_response["error"], "Fewer data fields than expected",
+            deserialized_response["error"],
+            "Bad Query - Fewer data fields than expected",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -126,7 +129,8 @@ class TestPartiesRoute(unittest.TestCase):
             msg="response code SHOULD BE 422 (Unprocessable Entity) + msg"
         )
         self.assertEqual(
-            deserialized_response["error"], "Invalid value in data field",
+            deserialized_response["error"],
+            "Unprocessable Entity - Invalid value in data field",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -140,7 +144,7 @@ class TestPartiesRoute(unittest.TestCase):
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
-            response.status_code, 201,
+            response.status_code, 409,
             msg="response code SHOULD BE 201 (Created)"
         )
         response = self.client().post(
@@ -150,7 +154,12 @@ class TestPartiesRoute(unittest.TestCase):
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
-            deserialized_response["error"], "Party already exists",
+            response.status_code, 409,
+            msg="response code SHOULD BE 409 (Conflict)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Conflict - Party already exists",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -162,7 +171,7 @@ class TestPartiesRoute(unittest.TestCase):
             headers={'content-type': 'application/json'}
         )
         self.assertEqual(
-            response.status_code, 201,
+            response.status_code, 409,
             msg="response code SHOULD BE 201 (Created)"
         )
         response = self.client().get("/api/v1/parties")
@@ -172,151 +181,81 @@ class TestPartiesRoute(unittest.TestCase):
 
     def test_fetching_a_party_by_id_with_a_valid_and_existing_id(self):
         """ Test the fetching of a single party using it's id """
-        # Post 1 sample record
-        response = self.client().post(
-            "/api/v1/parties",
-            data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertEqual(
-            response.status_code, 201,
-            msg="response code SHOULD BE 201 (Created)"
-        )
-
-        response_in_json = json.loads(
-            response.data.decode('utf-8').replace("'", "\"")
-        )
-        response_2 = self.client().get(
-            f'/api/v1/parties/{response_in_json["data"][0]["id"]}'
-        )
-        self.assertEqual(response_2.status_code, 200, msg="Should be 200(ok)")
-        self.assertIn("status", str(response_2.data))
-
+        response = self.client().get('/api/v1/parties/1')
+        self.assertEqual(response.status_code, 200, msg="Should be 200(ok)")
+        self.assertIn("status", str(response.data))
 
     def test_fetching_a_party_with_a_negative_id_value(self):
         """ Test with a negative integer """
-        # Post 1 sample record
-        response = self.client().post(
-            "/api/v1/parties",
-            data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertEqual(
-            response.status_code, 201,
-            msg="response code SHOULD BE 201 (Created)"
-        )
-
-        response_2 = self.client().get("/api/v1/parties/-1")
-        deserialized_response = json.loads(response_2.data.decode())
+        response = self.client().get("/api/v1/parties/-1")
+        deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
-            response_2.status_code, 400, msg="Should be 400 - (Bad Query)"
+            response.status_code, 404, msg="Should be 404 - (Not found)"
         )
         self.assertEqual(
-            deserialized_response["error"], "ID cannot be negative",
+            deserialized_response["error"],
+            "Resource not found on the server.",
             msg="Response Body Contents- Should be custom message "
         )
 
     def test_fetching_a_party_with_a_valid_id_that_is_out_of_bound(self):
-        """ Test with a integer that is out of bound (404 - Not found)"""
-        # Post 1 sample record
-        response = self.client().post(
-            "/api/v1/parties",
-            data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertEqual(
-            response.status_code, 201,
-            msg="response code SHOULD BE 201 (Created)"
-        )
+        """ Test with a integer that is out of bound (416 - Out of range)"""
 
-        response_2 = self.client().get("/api/v1/parties/1000")
-        deserialized_response = json.loads(response_2.data.decode())
+        response = self.client().get("/api/v1/parties/1000")
+        deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
-            response_2.status_code, 404, msg="Should be 404 - (Not Found)"
+            response.status_code, 416, msg="Should be 416 - Out of range"
         )
         self.assertEqual(
-            deserialized_response["error"], "ID out of bound",
+            deserialized_response["error"],
+            "ID out of range. Requested Range Not Satisfiable",
             msg="Response Body Contents- Should be custom message "
         )
 
     def test_fetching_a_party_with_a_floating_point_value_for_id(self):
         """ Test with a floating point number (400 - malformed syntax) """
-        # Post 1 sample record
-        response = self.client().post(
-            "/api/v1/parties",
-            data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertEqual(
-            response.status_code, 201,
-            msg="response code SHOULD BE 201 (Created)"
-        )
-
-        response_2 = self.client().get("/api/v1/parties/1.0")
-        deserialized_response = json.loads(response_2.data.decode())
+        response = self.client().get("/api/v1/parties/1.0")
+        deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
-            response_2.status_code, 400,
-            msg="Should be 400-(Malformed syntax)"
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
         )
         self.assertEqual(
             deserialized_response["error"],
-            "ID cannot be a floating-point number. Integers only",
+            "Resource not found on the server.",
             msg="Response Body Contents- Should be custom message "
         )
 
     def test_fetching_a_party_with_a_non_numeric_value_for_id(self):
-        """ Test fetching with a non-numeric character 400 Bad query """
-        # Post 1 sample record
-        response = self.client().post(
-            "/api/v1/parties",
-            data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertEqual(
-            response.status_code, 201,
-            msg="response code SHOULD BE 201 (Created)"
-        )
-
-        response_2 = self.client().get("/api/v1/parties/one")
-        deserialized_response = json.loads(response_2.data.decode())
+        """ Test fetching with a non-numeric character 404 Not found """
+        response = self.client().get("/api/v1/parties/one")
+        deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
-            response_2.status_code, 400,
-            msg="Should be 400-(Bad Query)"
+            response.status_code, 404,
+            msg="Should be 404-(Not Found)"
         )
         self.assertEqual(
             deserialized_response["error"],
-            "ID cannot be a string. Integers only",
+            "Resource not found on the server.",
             msg="Response Body Contents- Should be custom message "
         )
 
-
     def test_fetching_a_party_without_providing_a_value_blank_field(self):
         """ 400 - Bad query"""
-        # Post 1 sample record
-        response = self.client().post(
-            "/api/v1/parties",
-            data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertEqual(
-            response.status_code, 201,
-            msg="response code SHOULD BE 201 (Created)"
-        )
-
-        response_2 = self.client().get("/api/v1/parties/")
-        deserialized_response = json.loads(response_2.data.decode())
+        response = self.client().get("/api/v1/parties/")
+        deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
-            response_2.status_code, 400,
+            response.status_code, 404,
             msg="Should be 400-(Bad Query)"
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Expoected an Integer for ID",
+            "Resource not found on the server.",
             msg="Response Body Contents- Should be custom message "
         )
 
