@@ -7,7 +7,7 @@ from app.api.v1.party_models import PoliticalParties
 BASE_BP_V1 = Blueprint("v1_base", __name__, url_prefix="/api/v1")
 
 
-@BASE_BP_V1.route("/parties", methods=["POST"])
+@BASE_BP_V1.route("/parties", methods=["POST", "GET"])
 def parties():
     """
         Create a political party - POST
@@ -40,7 +40,7 @@ def parties():
             custom_response = jsonify(sample_party.create_party()), 201
 
     elif request.method == "GET":
-        pass
+        custom_response = jsonify(PoliticalParties.get_all_parties())
 
     else:
         pass
