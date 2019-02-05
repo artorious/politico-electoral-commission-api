@@ -95,5 +95,26 @@ class PoliticalParties:
                 "status": "success",
                 "data": POLITICAL_PARTIES
             }
-
         return custom_msg
+
+    @staticmethod
+    def fetch_a_party(id):
+        """ Fetch a political party by ID"""
+        # check if id exist in parties
+            # {
+                # "status": "Integer(200)",
+                # "data": [{
+                    # "id": "Integer",
+                    # "name": "String",
+                    # "hq_address": "String",
+                    # "logo_url": "String",
+                    # "party_members": "integer",
+                    # "registered_on": "timestamp"
+                # }]
+            # }
+        # Partyid out of bound
+            # {
+                    # "status": "integer",
+                    # "error": "String: relevant-error-message"
+                # }
+        pass

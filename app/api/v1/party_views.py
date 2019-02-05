@@ -46,3 +46,41 @@ def parties():
         pass
 
     return custom_response
+
+
+
+
+@BASE_BP_V1.route("/parties/<int:id>", methods=["GET"])
+def party(id):
+    """
+    GET -> Fetch political party by ID
+    """
+    custom_response = None
+    if request.method == "GET":
+        # TODO:
+        # Check if interger and not empty : 400 ????
+            # {
+                # "status": "integer",
+                # "error": "String: relevant-error-message"
+            # }
+        # Check if float: 400
+            # {
+                # "status": "integer",
+                # "error": "String: relevant-error-message"
+            # }
+        # check if its less than 1 : 400
+            # {
+                # "status": "integer",
+                # "error": "String: relevant-error-message"
+            # }
+        # call model with id
+
+        pass
+    else:
+        pass
+
+
+    return custom_response
+
+
+

@@ -31,7 +31,7 @@ class TestPartiesRoute(unittest.TestCase):
             msg="response code SHOULD BE 201 (Created)"
         )
 
-    def test_with_more_fields_than_expected(self):
+    def test_party_creation_with_more_fields_than_expected(self):
         """ Test with more fields than expected. """
         test_reg_data = {
             "name": "Jubilee",
@@ -56,7 +56,7 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
-    def test_with_fewer_fields_than_expected(self):
+    def test_party_creation_with_fewer_fields_than_expected(self):
         """ Test with fewer fields than expected """
         test_reg_data = {
             "name": "Jubilee",
@@ -79,7 +79,7 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
-    def test_with_an_empty_string_in_field(self):
+    def test_party_creation_with_an_empty_string_in_field(self):
         """ Test with an empty string in field """
         test_reg_data = {
             "name": "",
@@ -103,7 +103,7 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
-    def test_with_invalid_value_types(self):
+    def test_party_creation_with_invalid_value_types(self):
         """test with invalid value types  - 422 (Unprocessable Entity) + msg
         """
         test_reg_data = {
@@ -128,7 +128,7 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
-    def test_with_already_created_party(self):
+    def test_party_creation_with_already_existing_party(self):
         """ Test that a party cannot be created twice
         """
         response = self.client().post(
@@ -152,10 +152,8 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
-    def test_message_is_fetched_succesfully(self):
-        # Status 200
-        # data
-        # Create a party
+    def test_fetching_of_created_parties(self):
+        """ Test succesful fetch of all messages """
         response = self.client().post(
             "/api/v1/parties",
             data=json.dumps(self.party_reg_data),
@@ -170,6 +168,29 @@ class TestPartiesRoute(unittest.TestCase):
         self.assertIn("data", str(response.data))
         self.assertIn("status", str(response.data))
 
+    def test_fetching_a_party_by_id_with_a_valid_and_existing_id(self):
+        """ 200(ok)  + data """
+        pass
+
+    def test_fetching_a_party_with_a_negative_id_value(self):
+        """ 400 - malformed syntax"""
+        pass
+
+    def test_fetching_a_party_with_a_valid_id_that_is_out_of_bound(self):
+        """ 404 - Not found"""
+        pass
+
+    def test_fetching_a_party_with_a_floating_point_value_for_id(self):
+        """ 400 - malformed syntax """
+        pass
+
+    def test_fetching_a_party_with_a_non_numeric_value_for_id(self):
+        """ 400 Bad query """
+        pass
+
+    def test_fetching_a_party_without_providing_a_value_blank_field(self):
+        """ 400 - Bad query"""
+        pass
 
 if __name__ == "__main__":
     unittest.main()
