@@ -77,3 +77,23 @@ class PoliticalParties:
         else:
             custom_msg = False
         return custom_msg
+
+    @staticmethod
+    def get_all_parties():
+        """ Fetch all parties """
+        global POLITICAL_PARTIES
+        custom_msg = None
+
+        if POLITICAL_PARTIES == []:
+            custom_msg = {
+                "status": "success",
+                "data": "The Party list is empty"
+            }
+
+        else:
+            custom_msg = {
+                "status": "success",
+                "data": POLITICAL_PARTIES
+            }
+
+        return custom_msg
