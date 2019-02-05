@@ -30,6 +30,8 @@ class TestPartiesRoute(unittest.TestCase):
             response.status_code, 201,
             msg="response code SHOULD BE 201 (Created)"
         )
+        response_in_json = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        self.assertIn("status", response_in_json)
 
     def test_party_creation_with_more_fields_than_expected(self):
         """ Test with more fields than expected. """
@@ -169,28 +171,155 @@ class TestPartiesRoute(unittest.TestCase):
         self.assertIn("status", str(response.data))
 
     def test_fetching_a_party_by_id_with_a_valid_and_existing_id(self):
-        """ 200(ok)  + data """
-        pass
+        """ Test the fetching of a single party using it's id """
+        # Post 1 sample record
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+
+        response_in_json = json.loads(
+            response.data.decode('utf-8').replace("'", "\"")
+        )
+        response_2 = self.client().get(
+            f'/api/v1/parties/{response_in_json["data"][0]["id"]}'
+        )
+        self.assertEqual(response_2.status_code, 200, msg="Should be 200(ok)")
+        self.assertIn("status", str(response_2.data))
+
 
     def test_fetching_a_party_with_a_negative_id_value(self):
-        """ 400 - malformed syntax"""
-        pass
+        """ Test with a negative integer """
+        # Post 1 sample record
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+
+        response_2 = self.client().get("/api/v1/parties/-1")
+        deserialized_response = json.loads(response_2.data.decode())
+
+        self.assertEqual(
+            response_2.status_code, 400, msg="Should be 400 - (Bad Query)"
+        )
+        self.assertEqual(
+            deserialized_response["error"], "ID cannot be negative",
+            msg="Response Body Contents- Should be custom message "
+        )
 
     def test_fetching_a_party_with_a_valid_id_that_is_out_of_bound(self):
-        """ 404 - Not found"""
-        pass
+        """ Test with a integer that is out of bound (404 - Not found)"""
+        # Post 1 sample record
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+
+        response_2 = self.client().get("/api/v1/parties/1000")
+        deserialized_response = json.loads(response_2.data.decode())
+
+        self.assertEqual(
+            response_2.status_code, 404, msg="Should be 404 - (Not Found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"], "ID out of bound",
+            msg="Response Body Contents- Should be custom message "
+        )
 
     def test_fetching_a_party_with_a_floating_point_value_for_id(self):
-        """ 400 - malformed syntax """
-        pass
+        """ Test with a floating point number (400 - malformed syntax) """
+        # Post 1 sample record
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+
+        response_2 = self.client().get("/api/v1/parties/1.0")
+        deserialized_response = json.loads(response_2.data.decode())
+
+        self.assertEqual(
+            response_2.status_code, 400,
+            msg="Should be 400-(Malformed syntax)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "ID cannot be a floating-point number. Integers only",
+            msg="Response Body Contents- Should be custom message "
+        )
 
     def test_fetching_a_party_with_a_non_numeric_value_for_id(self):
-        """ 400 Bad query """
-        pass
+        """ Test fetching with a non-numeric character 400 Bad query """
+        # Post 1 sample record
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+
+        response_2 = self.client().get("/api/v1/parties/one")
+        deserialized_response = json.loads(response_2.data.decode())
+
+        self.assertEqual(
+            response_2.status_code, 400,
+            msg="Should be 400-(Bad Query)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "ID cannot be a string. Integers only",
+            msg="Response Body Contents- Should be custom message "
+        )
+
 
     def test_fetching_a_party_without_providing_a_value_blank_field(self):
         """ 400 - Bad query"""
-        pass
+        # Post 1 sample record
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+
+        response_2 = self.client().get("/api/v1/parties/")
+        deserialized_response = json.loads(response_2.data.decode())
+
+        self.assertEqual(
+            response_2.status_code, 400,
+            msg="Should be 400-(Bad Query)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Expoected an Integer for ID",
+            msg="Response Body Contents- Should be custom message "
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

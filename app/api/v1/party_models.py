@@ -32,7 +32,7 @@ class PoliticalParties:
             self.party_reg_data["registered on"] = time.asctime(time_stamp)
             POLITICAL_PARTIES.append(self.party_reg_data)
             custom_msg = {
-                "Status": "Success",
+                "status": "success",
                 "data": [{
                     "id": self.party_reg_data["id"],
                     "name": self.party_reg_data["name"]
