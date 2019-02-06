@@ -88,38 +88,35 @@ def party(pid):
 @BASE_BP_V1.route("/parties/<int:pid>/name", methods=["PATCH"])
 def party_manager(pid):
     """ Edit politcal party  name by ID"""
-    # request user data
-    # if "name" in user data
-        # if len of user data is 1
-            # if id is not 0
-                # if id exists in list
-                    # try editing the party with user data-> to model
-                    #return csm msg
-                # id does not exist
-                    # cstm error msg
-            # else if id is zero
-                #cstm error msg
-        # else if len of user data > 1
-            # cstom message
-    # else if "name" not in userdata
-        # custom msg
-    pass
+    custom_response = None
+    party_updates = request.get_json(force=True)
 
-# Response Spec:
+    if "name" not in party_updates or len(party_updates) != 1:
+        custom_response = jsonify({
+            "status": 400,
+            "error": "Bad Query - More data fields than expected"
+        }), 400
+    elif pid < 1:
+        custom_response = jsonify({
+            "status": "Failed",
+            "error": "ID cannot be zero"
+        }), 400
+    elif PoliticalParties.check_id_exists(pid) is False:
+        custom_response = jsonify({
+            "status": 416,
+            "error": "ID out of range. Requested Range Not Satisfiable"
+        }), 416
 
-# {
-    # “status” : Integer() ,
-    # “data” : [
-         # {
-              # “id” : Integer ,
-              # “name” : String (new name)
-           # }
-    # ]
-# }
+    elif PoliticalParties.check_for_valid_party_name(party_updates["name"]):
+        custom_response = jsonify({
+            "status": 422,
+            "error": "Name cannot be empty/space or 1 letter",
+            }), 422
 
-# or
+    else:
+        custom_response = jsonify({
+            "status": 200,
+            "data": PoliticalParties.edit_party(party_updates, pid)
+            }), 200
 
-# {
-    # “status” : integer ,
-    # “error” : “String: relevant-error-message”
-# }
+    return custom_response

@@ -95,37 +95,10 @@ class TestPolticalParties(unittest.TestCase):
         """ Test that valid user data gets updated """
         valid_update_data = {"name": "Ford Asili"}
         self.test_data.create_party()
-        self.assertDictEqual(
-            {"status": 200, "data": [{"id": 1, "name": "Ford Asili"}]},
+        self.assertEqual(
+            [{"id": 1, "name": "Ford Asili"}],
             PoliticalParties.edit_party(valid_update_data, 1),
-            msg="Expected Success status and new name"
-        )
-
-    def test_edit_party_handles_values_that_are_not_strings(self):
-        """ Test that name value is not;
-            empty string, space and is longer than 1 character
-        """
-        self.test_data.create_party()
-
-        empty_update_data_1 = {"name": ""}
-        empty_update_data_2 = {"name": "            "}
-        short_update_data = {"name": "A"}
-
-        self.assertDictEqual(
-            {"status": 400, "error": "Name cannot be empty/space or 1 letter"},
-            PoliticalParties.edit_party(empty_update_data_1, 1),
-            msg="Expected custom error msg"
-        )
-        self.assertDictEqual(
-            {"status": 400, "error": "Name cannot be empty/space or 1 letter"},
-            PoliticalParties.edit_party(empty_update_data_2, 1),
-            msg="Expected custom error msg"
-        )
-        self.assertDictEqual(
-            {"status": 400, "error": "Name cannot be empty/space or 1 letter"},
-            PoliticalParties.edit_party(short_update, 1),
-            msg="Expected custom error msg"
-        )
+            msg="Expected Success status and new name")
 
 
 if __name__ == "__main__":

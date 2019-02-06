@@ -7,7 +7,7 @@ POLITICAL_PARTIES = []
 PARTY_COUNT = 1
 
 
-class PoliticalParties(object):
+class PoliticalParties:
     """ Methods to model party information """
     def __init__(self, party_reg_data):
         self.party_reg_data = party_reg_data
@@ -103,6 +103,8 @@ class PoliticalParties(object):
 
         if pid in [party["id"] for party in POLITICAL_PARTIES]:
             return True
+        else:
+            return False
 
     @staticmethod
     def fetch_a_party(pid):
@@ -110,14 +112,20 @@ class PoliticalParties(object):
         global POLITICAL_PARTIES
         return [party for party in POLITICAL_PARTIES if party['id'] == pid]
 
+    @staticmethod
+    def check_for_valid_party_name(name):
+        """ check name is not empty string, space & longer than 1 charaster"""
+        if isinstance(name, str):
+            return len(name.strip()) < 1
+        else:
+            return False
 
     @staticmethod
     def edit_party(user_data, pid):
         """ Edit apolitical party """
+        global POLITICAL_PARTIES
+        for party in POLITICAL_PARTIES:
+            if party['id'] == pid:
+                party['name'] = user_data["name"]
 
-        # check name is not empty string, space and longer than 1 char
-            # edit party
-        # Else name not valid value type
-            # cusom msg
-        # return custom msg
-        pass
+        return [{"id": pid, "name": user_data["name"]}]
