@@ -83,3 +83,43 @@ def party(pid):
         pass
 
     return custom_response
+
+
+@BASE_BP_V1.route("/parties/<int:pid>/name", methods=["PATCH"])
+def party_manager(pid):
+    """ Edit politcal party  name by ID"""
+    # request user data
+    # if "name" in user data
+        # if len of user data is 1
+            # if id is not 0
+                # if id exists in list
+                    # try editing the party with user data-> to model
+                    #return csm msg
+                # id does not exist
+                    # cstm error msg
+            # else if id is zero
+                #cstm error msg
+        # else if len of user data > 1
+            # cstom message
+    # else if "name" not in userdata
+        # custom msg
+    pass
+
+# Response Spec:
+
+# {
+    # “status” : Integer() ,
+    # “data” : [
+         # {
+              # “id” : Integer ,
+              # “name” : String (new name)
+           # }
+    # ]
+# }
+
+# or
+
+# {
+    # “status” : integer ,
+    # “error” : “String: relevant-error-message”
+# }

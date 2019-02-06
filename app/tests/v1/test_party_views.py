@@ -215,7 +215,7 @@ class TestPartiesRoute(unittest.TestCase):
         )
 
     def test_fetching_a_party_with_a_floating_point_value_for_id(self):
-        """ Test with a floating point number (400 - malformed syntax) """
+        """ Test with a floating point number """
         response = self.client().get("/api/v1/parties/1.0")
         deserialized_response = json.loads(response.data.decode())
 
@@ -249,6 +249,210 @@ class TestPartiesRoute(unittest.TestCase):
         response = self.client().get("/api/v1/parties/")
         deserialized_response = json.loads(response.data.decode())
 
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 400-(Bad Query)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+###############################
+    def test_edit_party_with_valid_id_and_valid_name(self):
+        """ Test party name update with valid user data """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 200,
+            msg="Should be 200(ok)"
+        )
+        self.assertEqual(
+            deserialized_response["data"],
+            [{"id": 1, "name":"Ford Asili"}],
+            msg="Response Body Contents- Should be new name "
+        )
+
+    def test_edit_party_with_valid_id_and_non_string_name(self):
+        """ 422 unporcessablbe  """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        invalid_update_data = {"name": 1}
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            data=json.dumps(invalid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 422,
+            msg="Should be 422 (unprocessable  data)"
+        )
+        self.assertEqual(
+            deserialized_response["data"],
+            [{"id": 1, "name":"Ford Asili"}],
+            msg="Response Body Contents- Should be new name "
+        )
+
+    def test_edit_party_with_non_integer_id_and_valid_name(self):
+        """ Test invalid type for party ID throws a 404 code """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/one/name",
+            data=json.dumps(invalid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not Found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_an_out_of_range_id(self):
+        """ Test with an ID that is out of range  """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/100000/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 416, msg="Should be 416 - Out of range"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "ID out of range. Requested Range Not Satisfiable",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_a_float_as_id(self):
+        """ 404 """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/1.0/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_negative_id(self):
+        """ 404 """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/-1/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_valid_id_and_empty_name_str(self):
+        """ 422"""
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "       "}
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 422,
+            msg="response code SHOULD BE 422 (Unprocessable Entity)"
+        )
+        self.assertEqual(
+            deserialized_response["error"], "Empty data field",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_with_valid_id_and_empty_name_field(self):
+        """ 400 no paylaod"""
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = None
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
             response.status_code, 404,
             msg="Should be 400-(Bad Query)"

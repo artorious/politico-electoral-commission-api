@@ -109,3 +109,15 @@ class PoliticalParties(object):
         """ Fetch a political party by ID"""
         global POLITICAL_PARTIES
         return [party for party in POLITICAL_PARTIES if party['id'] == pid]
+
+
+    @staticmethod
+    def edit_party(user_data, pid):
+        """ Edit apolitical party """
+
+        # check name is not empty string, space and longer than 1 char
+            # edit party
+        # Else name not valid value type
+            # cusom msg
+        # return custom msg
+        pass
