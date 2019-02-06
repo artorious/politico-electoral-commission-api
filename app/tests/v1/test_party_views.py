@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-""" Test models """
+""" Test Cases for Views/Routes """
 import unittest
 import json
 from app import create_app
 
 
-class TestPartiesRoute(unittest.TestCase):
-    """ Test case for party views """
+class TestPartiesRoutes(unittest.TestCase):
+    """ Parent test case for all party related views """
 
     def setUp(self):
         """ Init app and test vars """
@@ -19,6 +19,9 @@ class TestPartiesRoute(unittest.TestCase):
             "Party members": 225
         }
 
+
+class TestPartyCreation(TestPartiesRoutes):
+    """ Tests for creating a political party """
     def test_party_creation_with_valid_data(self):
         """test with valid data - 201 (created) + data"""
         response = self.client().post(
@@ -163,6 +166,9 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
+
+class TestFetchingParty(TestPartiesRoutes):
+    """ Test for feching a single political party by ID """
     def test_fetching_of_created_parties(self):
         """ Test succesful fetch of all messages """
         response = self.client().post(
@@ -259,6 +265,9 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
+
+class TestEditParty(TestPartiesRoutes):
+    """ Test for editing a political party by ID """
     def test_edit_party_with_valid_id_and_valid_name(self):
         """ Test party name update with valid user data """
         response = self.client().post(
