@@ -30,7 +30,7 @@ class TestPolticalParties(unittest.TestCase):
             empty_str.check_for_any_empty_fields(), msg="Should be False"
         )
 
-    def test_expected_keys_check(self):
+    def test_expected_keys_in_party_reg_data_check(self):
         """ Check for expected keys in user data"""
         test_data2 = PoliticalParties({
             "names": "jubilee",
@@ -50,7 +50,7 @@ class TestPolticalParties(unittest.TestCase):
             msg="Should be False"
         )
 
-    def test_expected_value_types(self):
+    def test_expected_value_types_party_reg_data(self):
         """ Check value(datatypes) types of user data"""
         wrong_value_types = PoliticalParties({
             "name": 12,
@@ -67,23 +67,30 @@ class TestPolticalParties(unittest.TestCase):
             msg="Should be False"
         )
 
-    def test_create_party_return_msg(self):
+    def test_create_party_method_returns_a_custom_message(self):
         """ Test a political prty is created"""
         self.assertDictEqual(
-            {'Status': 'Success', 'data': [{'id': 1, 'name': 'Jubilee'}]},
+            {'status': 201, 'data': [{'id': 1, 'name': 'Jubilee'}]},
             self.test_data.create_party()
         )
 
-    def test_creating_a_party_twice(self):
+    def test_creating_a_party_twice_is_caught_and_handled(self):
         """ Test a political pary cannot be created twice """
-        self.test_data.create_party()
-        self.assertDictEqual(
-            self.test_data.create_party(),
-            {'status': 'Failed', 'error': 'Party already exists'}
-        )
+        self.assertTrue(self.test_data.check_whether_party_exists("Jubilee"))
 
-    def test_fetching_parties(self):
+    def test_fetching_all_parties_returns_data(self):
+        """ Test that a dictionary holding the data is returned """
         self.assertIsInstance(self.test_data.get_all_parties(), dict)
+
+    def test_that_id_look_up_is_done_before_fetching(self):
+        """ Test that method checks that the id value exists"""
+        # try ferching an obnoxious no.
+        self.assertFalse(self.test_data.check_id_exists(1000000000000))
+
+    def test_fetching_a_party_by_id_returns_data(self):
+        """ Test method returns data"""
+        self.assertIsInstance(self.test_data.fetch_a_party(1), list)
+
 
 if __name__ == "__main__":
     unittest.main()

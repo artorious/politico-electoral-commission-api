@@ -8,4 +8,5 @@ A web application platform which both the politicians and citizens can use. Poli
 ## Features
 * Create a political party
 * Fetch all political parties
+* Fetch a specific political party
 
