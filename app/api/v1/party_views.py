@@ -83,3 +83,40 @@ def party(pid):
         pass
 
     return custom_response
+
+
+@BASE_BP_V1.route("/parties/<int:pid>/name", methods=["PATCH"])
+def party_manager(pid):
+    """ Edit politcal party  name by ID"""
+    custom_response = None
+    party_updates = request.get_json(force=True)
+
+    if "name" not in party_updates or len(party_updates) != 1:
+        custom_response = jsonify({
+            "status": 400,
+            "error": "Bad Query - More data fields than expected"
+        }), 400
+    elif pid < 1:
+        custom_response = jsonify({
+            "status": "Failed",
+            "error": "ID cannot be zero"
+        }), 400
+    elif PoliticalParties.check_id_exists(pid) is False:
+        custom_response = jsonify({
+            "status": 416,
+            "error": "ID out of range. Requested Range Not Satisfiable"
+        }), 416
+
+    elif PoliticalParties.check_for_valid_party_name(party_updates["name"]):
+        custom_response = jsonify({
+            "status": 422,
+            "error": "Name cannot be empty/space or 1 letter",
+            }), 422
+
+    else:
+        custom_response = jsonify({
+            "status": 200,
+            "data": PoliticalParties.edit_party(party_updates, pid)
+            }), 200
+
+    return custom_response

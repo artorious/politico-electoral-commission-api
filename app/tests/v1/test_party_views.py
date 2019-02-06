@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-""" Test models """
+""" Test Cases for Views/Routes """
 import unittest
 import json
 from app import create_app
 
 
-class TestPartiesRoute(unittest.TestCase):
-    """ Test case for party views """
+class TestPartiesRoutes(unittest.TestCase):
+    """ Parent test case for all party related views """
 
     def setUp(self):
         """ Init app and test vars """
@@ -19,6 +19,9 @@ class TestPartiesRoute(unittest.TestCase):
             "Party members": 225
         }
 
+
+class TestPartyCreation(TestPartiesRoutes):
+    """ Tests for creating a political party """
     def test_party_creation_with_valid_data(self):
         """test with valid data - 201 (created) + data"""
         response = self.client().post(
@@ -163,6 +166,9 @@ class TestPartiesRoute(unittest.TestCase):
             msg="Response Body Contents- Should be custom message "
         )
 
+
+class TestFetchingParty(TestPartiesRoutes):
+    """ Test for feching a single political party by ID """
     def test_fetching_of_created_parties(self):
         """ Test succesful fetch of all messages """
         response = self.client().post(
@@ -215,7 +221,7 @@ class TestPartiesRoute(unittest.TestCase):
         )
 
     def test_fetching_a_party_with_a_floating_point_value_for_id(self):
-        """ Test with a floating point number (400 - malformed syntax) """
+        """ Test with a floating point number """
         response = self.client().get("/api/v1/parties/1.0")
         deserialized_response = json.loads(response.data.decode())
 
@@ -256,6 +262,263 @@ class TestPartiesRoute(unittest.TestCase):
         self.assertEqual(
             deserialized_response["error"],
             "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+
+class TestEditParty(TestPartiesRoutes):
+    """ Test for editing a political party by ID """
+    def test_edit_party_with_valid_id_and_valid_name(self):
+        """ Test party name update with valid user data """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 200,
+            msg="Should be 200(ok)"
+        )
+        self.assertEqual(
+            deserialized_response["data"],
+            [{"id": 1, "name": "Ford Asili"}],
+            msg="Response Body Contents- Should be new name "
+        )
+
+    def test_edit_party_with_non_integer_id_and_valid_name(self):
+        """ Test invalid type for party ID throws a 404 code """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/one/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not Found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_an_out_of_range_id(self):
+        """ Test with an ID that is out of range  """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/100000/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 416, msg="Should be 416 - Out of range"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "ID out of range. Requested Range Not Satisfiable",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_a_float_as_id(self):
+        """ 404 """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/1.0/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_negative_id(self):
+        """ Test with a negative value for ID """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/-1/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_valid_id_and_empty_name_str(self):
+        """ Test an empty string or a single character string is handled
+            422 - unprocessable
+        """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        empty_str_update_data = {"name": "       "}
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            data=json.dumps(empty_str_update_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 422,
+            msg="response code SHOULD BE 422 (Unprocessable Entity)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Name cannot be empty/space or 1 letter",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+        empty_str_update_data_2 = {"name": ""}
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            data=json.dumps(empty_str_update_data_2),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 422,
+            msg="response code SHOULD BE 422 (Unprocessable Entity)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Name cannot be empty/space or 1 letter",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_with_valid_id_and_empty_name_field(self):
+        """ 400 no paylaod"""
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 400,
+            msg="Should be 400-(Bad Query)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Malformed request syntax or invalid request message framing",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_more_fields_than_expected(self):
+        """ Test with more fields than Expected -400"""
+
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        extra_update_data = {
+            "name": "Ford Asili",
+            "logoUrl": "/static/jubilee.jpeg"
+        }
+        response = self.client().patch(
+            "/api/v1/parties/1/name",
+            data=json.dumps(extra_update_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 400,
+            msg="response code SHOULD BE 400 (bad query)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Bad Query - More data fields than expected",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_edit_party_with_id_value_zero(self):
+        """ Test with a zero as value for ID """
+        response = self.client().post(
+            "/api/v1/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        valid_update_data = {"name": "Ford Asili"}
+        response = self.client().patch(
+            "/api/v1/parties/0/name",
+            data=json.dumps(valid_update_data),
+            headers={'content-type': 'application/json'}
+        )
+
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 400,
+            msg="Should be 400 status"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "ID cannot be zero",
             msg="Response Body Contents- Should be custom message "
         )
 

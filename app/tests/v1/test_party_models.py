@@ -91,6 +91,15 @@ class TestPolticalParties(unittest.TestCase):
         """ Test method returns data"""
         self.assertIsInstance(self.test_data.fetch_a_party(1), list)
 
+    def test_edit_party_performs_operation_and_returns_message(self):
+        """ Test that valid user data gets updated """
+        valid_update_data = {"name": "Ford Asili"}
+        self.test_data.create_party()
+        self.assertEqual(
+            [{"id": 1, "name": "Ford Asili"}],
+            PoliticalParties.edit_party(valid_update_data, 1),
+            msg="Expected Success status and new name")
+
 
 if __name__ == "__main__":
     unittest.main()
