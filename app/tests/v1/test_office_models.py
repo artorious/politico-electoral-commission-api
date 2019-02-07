@@ -4,7 +4,7 @@ import unittest
 from app.api.v1.office_models import PoliticalOffices
 
 
-class TestPolticalParties(unittest.TestCase):
+class TestPolticalOffices(unittest.TestCase):
     """ Testscase for PoliticalParties"""
     def setUp(self):
         """ Initialize test variable"""
@@ -97,6 +97,26 @@ class TestPolticalParties(unittest.TestCase):
             self.test_federal_office_reg_data.check_whether_office_exists(
                 "President of the Republic")
             )
+
+    def test_fetching_all_offices_returns_data(self):
+        """ Test that a dictionary holding the data is returned """
+        self.assertIsInstance(
+            self.test_federal_office_reg_data.get_all_offices(), dict
+        )
+
+    def test_that_id_look_up_is_done_before_fetching(self):
+        """ Test that method checks that the id value exists"""
+
+        self.assertFalse(
+            self.test_federal_office_reg_data.check_id_exists(99999999)
+        )
+
+    def test_fetching_an_office_by_id_returns_data(self):
+        """ Test method returns data"""
+        self.assertIsInstance(
+            self.test_federal_office_reg_data.fetch_an_office(1), list
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

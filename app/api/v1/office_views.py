@@ -60,3 +60,32 @@ def offices():
         pass
 
     return custom_response
+
+@OFFICE_BP_V1.route("/offices/<int:pid>", methods=["GET"])
+def party(pid):
+    """Fetch political office by ID """
+    custom_response = None
+
+    if request.method == "GET":
+
+        if isinstance(pid, int) and pid >= 1:
+            if PoliticalOffices.check_id_exists(pid) is True:
+                custom_response = jsonify({
+                    "status": 200,
+                    "data": PoliticalOffices.fetch_an_office(pid)
+                }), 200
+            else:
+                custom_response = jsonify({
+                    "status": 416,
+                    "error": "ID out of range. Requested Range Not Satisfiable"
+                }), 416
+        elif pid < 1:
+            custom_response = jsonify({
+                "status": "Failed",
+                "error": "ID cannot be zero or negative"
+            }), 400
+    else:
+        pass
+
+    return custom_response
+

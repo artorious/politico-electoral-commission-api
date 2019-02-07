@@ -159,10 +159,90 @@ class TestFetchingOffice(TestOfficeRoutes):
     """ Test for feching a single political office by ID """
     def test_fetching_of_created_offices(self):
         """ Test succesful fetch of all messages """
-        response = self.client().get("/api/v1/parties")
+        response = self.client().get("/api/v1/offices")
         self.assertEqual(response.status_code, 200)
         self.assertIn("data", str(response.data))
         self.assertIn("status", str(response.data))
+
+    def test_fetching_an_office_by_id_with_a_valid_and_existing_id(self):
+        """ Test the fetching of a single pilitical office using it's id """
+        response = self.client().get('/api/v1/offices/1')
+        self.assertEqual(response.status_code, 200, msg="Should be 200(ok)")
+        self.assertIn("status", str(response.data))
+
+    def test_fetching_an_office_with_a_negative_id_value(self):
+        """ Test with a negative integer """
+        response = self.client().get("/api/v1/offices/-1")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404, msg="Should be 404 - (Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_fetching_an_office_with_a_valid_id_that_is_out_of_bound(self):
+        """ Test with a integer that is out of bound (416 - Out of range)"""
+
+        response = self.client().get("/api/v1/offices/1000")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 416, msg="Should be 416 - Out of range"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "ID out of range. Requested Range Not Satisfiable",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_fetching_an_office_with_a_floating_point_value_for_id(self):
+        """ Test with a floating point number """
+        response = self.client().get("/api/v1/offices/1.0")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_fetching_an_office_with_a_non_numeric_value_for_id(self):
+        """ Test fetching with a non-numeric character 404 Not found """
+        response = self.client().get("/api/v1/office/one")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not Found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_fetching_an_office_without_providing_a_value_blank_field(self):
+        """ 400 - Bad query"""
+        response = self.client().get("/api/v1/offices/")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 400-(Bad Query)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
 
 if __name__ == "__main__":
     unittest.main()
