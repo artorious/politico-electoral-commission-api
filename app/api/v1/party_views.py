@@ -4,13 +4,14 @@
 from flask import Blueprint, jsonify, request
 from app.api.v1.party_models import PoliticalParties
 
-BASE_BP_V1 = Blueprint("v1_base", __name__, url_prefix="/api/v1")
+PARTY_BP_V1 = Blueprint("v1_party", __name__, url_prefix="/api/v1")
 
 
-@BASE_BP_V1.route("/parties", methods=["POST", "GET"])
+@PARTY_BP_V1.route("/parties", methods=["POST", "GET"])
 def parties():
     """
         Create a political party - POST
+        Fetch all political parties - GET
     """
     custom_response = None
     if request.method == "POST":
@@ -54,7 +55,7 @@ def parties():
     return custom_response
 
 
-@BASE_BP_V1.route("/parties/<int:pid>", methods=["GET"])
+@PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET"])
 def party(pid):
     """
     GET -> Fetch political party by ID
@@ -85,7 +86,7 @@ def party(pid):
     return custom_response
 
 
-@BASE_BP_V1.route("/parties/<int:pid>/name", methods=["PATCH"])
+@PARTY_BP_V1.route("/parties/<int:pid>/name", methods=["PATCH"])
 def party_manager(pid):
     """ Edit politcal party  name by ID"""
     custom_response = None

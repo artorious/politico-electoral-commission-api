@@ -33,8 +33,10 @@ def create_app(config_mode):
     app.config.from_pyfile('config.py')
     # local imports
     from app.api.v1 import party_views
+    from app.api.v1 import office_views
     # Register Blueprints
-    app.register_blueprint(party_views.BASE_BP_V1)
+    app.register_blueprint(party_views.PARTY_BP_V1)
+    app.register_blueprint(office_views.OFFICE_BP_V1)
     # Custom error handlers
     app.register_error_handler(404, page_not_found_error)
     app.register_error_handler(400, bad_user_request_error)
