@@ -5,7 +5,9 @@ import time
 POLITICAL_OFFICES = []
 OFFICE_COUNT = 1
 
+
 class PoliticalOffices:
+    """ Methods to handle office related data"""
     def __init__(self, office_reg_data):
         self.office_reg_data = office_reg_data
 
@@ -33,8 +35,7 @@ class PoliticalOffices:
 
     def check_for_expected_type_of_office(self, list_of_expected_types):
         """ Checks for the expected values in the type key in user input"""
-        expected = ["Federal", "Legislative", "State", "Local Government"]
-        return self.office_reg_data["type"] in expected
+        return self.office_reg_data["type"] in list_of_expected_types
 
     def check_any_for_empty_fields(self):
         """ Returns True only if the expected values in office registration
@@ -51,7 +52,6 @@ class PoliticalOffices:
         else:
             custom_msg = True
         return custom_msg
-
 
     def check_for_only_expected_value_types(self):
         """ Returns True only if the expected value types in office registration
@@ -76,13 +76,3 @@ class PoliticalOffices:
                 office_already_present = True
 
         return office_already_present
-
-    @staticmethod
-    def check_for_valid_office_name(name):
-        """ Returns true if name is not space, empty, or less than 1 character
-            else, returns False
-        """
-        pass
-
-
-

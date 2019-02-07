@@ -6,6 +6,7 @@ from app.api.v1.office_models import PoliticalOffices
 
 OFFICE_BP_V1 = Blueprint("v1_office", __name__, url_prefix="/api/v1")
 
+
 @OFFICE_BP_V1.route("/offices", methods=["POST"])
 def offices():
     """ Create a political party - POST """
@@ -25,12 +26,15 @@ def offices():
                 "error": "Bad Query - Fewer data fields than expected"
             }), 400
 
-        elif sample_office.check_for_expected_keys_present(["name", "type"]) is False:
+        elif sample_office.check_for_expected_keys_present(
+                ["name", "type"]) is False:
             custom_response = jsonify({
                 "status": 422,
                 "error": "Unprocessable Entity - Invalid value in data field"
             }), 422
-        elif sample_office.check_for_expected_type_of_office(["Federal", "Legislative", "State", "Local Government"]) is False:
+        elif sample_office.check_for_expected_type_of_office(
+                ["Federal", "Legislative", "State", "Local Government"]
+                ) is False:
             custom_response = jsonify({
                 "status": 422,
                 "error": "Unprocessable Entity - Invalid value in data field"
@@ -53,7 +57,3 @@ def offices():
         pass
 
     return custom_response
-
-
-
-

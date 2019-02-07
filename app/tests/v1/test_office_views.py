@@ -30,7 +30,6 @@ class TestOfficeRoutes(unittest.TestCase):
         }
 
 
-
 class TestOfficeCreation(TestOfficeRoutes):
     """ Tests for creating a political party """
     def test_office_creation_with_valid_data(self):
@@ -46,12 +45,11 @@ class TestOfficeCreation(TestOfficeRoutes):
 
     def test_ofice_creation_with_more_fields_than_is_expected(self):
         """ Test with more fields than expected. """
-        test_extra_data =legislative_office_reg_data = {
+        test_extra_data = {
             "name": "Member of Congress",
             "type": "Legislative",
             "sneak": "I'm not supposed to be here"
         }
-
 
         response = self.client().post(
             "/api/v1/offices",
@@ -111,7 +109,8 @@ class TestOfficeCreation(TestOfficeRoutes):
             msg="response code SHOULD BE 422 (Unprocessable Entity)"
         )
         self.assertEqual(
-            deserialized_response["error"], "Unprocessable Entity - Invalid value in data field",
+            deserialized_response["error"],
+            "Unprocessable Entity - Invalid value in data field",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -126,53 +125,10 @@ class TestOfficeCreation(TestOfficeRoutes):
             msg="response code SHOULD BE 422 (Unprocessable Entity) "
         )
         self.assertEqual(
-            deserialized_response["error"], "Unprocessable Entity - Invalid value in data field",
+            deserialized_response["error"],
+            "Unprocessable Entity - Invalid value in data field",
             msg="Response Body Contents- Should be custom message "
         )
-
-    # def test_office_creation_with_invalid_value_types(self):
-        # """ Test with invalid value types  - 422 (Unprocessable Entity) """
-        # invalid_types_legislative_name_data = {
-            # "name": 1,
-            # "type": "Legislative"
-        # }
-
-        # invalid_types_legislative_type_data = {
-            # "name": "Memnber of Congress",
-            # "type": ["Legislative"]
-        # }
-
-        # response = self.client().post(
-            # "/api/v1/offices",
-            # data=json.dumps(invalid_types_legislative_name_data),
-            # headers={'content-type': 'application/json'}
-        # )
-        # deserialized_response = json.loads(response.data.decode())
-        # self.assertEqual(
-            # response.status_code, 422,
-            # msg="response code SHOULD BE 422 (Unprocessable Entity)"
-        # )
-        # self.assertEqual(
-            # deserialized_response["error"],
-            # "Unprocessable Entity - Invalid value in data field",
-            # msg="Response Body Contents- Should be custom message "
-        # )
-
-        # response = self.client().post(
-            # "/api/v1/offices",
-            # data=json.dumps(invalid_types_legislative_type_data),
-            # headers={'content-type': 'application/json'}
-        # )
-        # deserialized_response = json.loads(response.data.decode())
-        # self.assertEqual(
-            # response.status_code, 422,
-            # msg="response code SHOULD BE 422 (Unprocessable Entity)"
-        # )
-        # self.assertEqual(
-            # deserialized_response["error"],
-            # "Unprocessable Entity - Invalid value in data field",
-            # msg="Response Body Contents- Should be custom message "
-        # )
 
     def test_office_creation_with_already_existing_posting(self):
         """ Test that a office posting cannot be created twice """
