@@ -155,5 +155,14 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
 
 
+class TestFetchingOffice(TestOfficeRoutes):
+    """ Test for feching a single political office by ID """
+    def test_fetching_of_created_offices(self):
+        """ Test succesful fetch of all messages """
+        response = self.client().get("/api/v1/parties")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("data", str(response.data))
+        self.assertIn("status", str(response.data))
+
 if __name__ == "__main__":
     unittest.main()

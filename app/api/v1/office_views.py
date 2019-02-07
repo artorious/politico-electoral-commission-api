@@ -7,9 +7,11 @@ from app.api.v1.office_models import PoliticalOffices
 OFFICE_BP_V1 = Blueprint("v1_office", __name__, url_prefix="/api/v1")
 
 
-@OFFICE_BP_V1.route("/offices", methods=["POST"])
+@OFFICE_BP_V1.route("/offices", methods=["POST", "GET"])
 def offices():
-    """ Create a political party - POST """
+    """ Create a political party - POST
+        Fetch all political offices - GET
+    """
     custom_response = None
     if request.method == "POST":
         office_reg_data = request.get_json(force=True)
@@ -52,7 +54,8 @@ def offices():
             }), 409
         else:
             custom_response = jsonify(sample_office.create_office()), 201
-
+    elif request.method == "GET":
+        custom_response = jsonify(PoliticalOffices.get_all_offices())
     else:
         pass
 
