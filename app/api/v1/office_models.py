@@ -80,4 +80,19 @@ class PoliticalOffices:
 
     @staticmethod
     def get_all_offices():
-        pass
+        """ Fetch all parties """
+        global POLITICAL_OFFICES
+        custom_msg = None
+
+        if POLITICAL_OFFICES == []:
+            custom_msg = {
+                "status": 200,
+                "data": "The Office list is empty"
+            }
+
+        else:
+            custom_msg = {
+                "status": 200,
+                "data": POLITICAL_OFFICES
+            }
+        return custom_msg

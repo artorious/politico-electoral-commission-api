@@ -13,3 +13,5 @@ A web application platform which both the politicians and citizens can use. Poli
 * Fetch a specific political party
 * Edit a political party
 * Create Political Office
+* Fetch all political Offices
+

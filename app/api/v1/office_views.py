@@ -55,7 +55,7 @@ def offices():
         else:
             custom_response = jsonify(sample_office.create_office()), 201
     elif request.method == "GET":
-        pass
+        custom_response = jsonify(PoliticalOffices.get_all_offices())
     else:
         pass
 
