@@ -76,3 +76,8 @@ class PoliticalOffices:
                 office_already_present = True
 
         return office_already_present
+
+
+    @staticmethod
+    def get_all_offices():
+        pass
