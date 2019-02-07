@@ -7,11 +7,31 @@
 # politico-electoral-commission-api
 A web application platform which both the politicians and citizens can use. Politico enables citizens give their mandate to politicians running for different government offices while building trust in the process through transparency.
 
-## Features
-* Create a political party
-* Fetch all political parties
-* Fetch a specific political party
-* Edit a political party
-* Create Political Office
-* Fetch all political Offices
+## Endpoints - Features
 
+**Endpoint** | **Request**| **Description**
+--- | --- | ---
+`/api/v1/parties` | `POST` | Create a political party
+`/api/v1/parties` | `GET`| Fetch all political parties
+`/api/v1/parties/<int:id>` | `GET` |   Fetch a specific political party
+`/api/v1/<int:id>/name` | `PATCH` | Edit a political party
+`/app/api/v1/offices` | `POST`| Create Political office
+`/api/v1/offices` | `GET` | Fetch all political offices
+`/api/v1/offices/<int:id>` | `GET` | Fetch a specific offices
+
+## Usage
+* Read and interact with the [API Documentation](https://documenter.getpostman.com/view/3796196/RztoKnTh)
+### Testing
+* On Postaman App:
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/016419570361ff8cce12)
+
+On a  terminal (Linux):
+* Install and set up git, python3 and a virtual environment
+
+* In a virtual environment;
+  * Clone the repository `git clone https://github.com/artorious/politico-electoral-commission-api.git`
+
+  * Run `git checkout develop`
+  * Run `cd politico-electoral-commission-api`
+  * Run `pip3 install -r requirements.txt` to install dependancies
+  * Run `python3 run.py` to interact with the app.
