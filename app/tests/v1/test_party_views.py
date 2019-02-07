@@ -29,10 +29,6 @@ class TestPartyCreation(TestPartiesRoutes):
             data=json.dumps(self.party_reg_data),
             headers={'content-type': 'application/json'}
         )
-        self.assertEqual(
-            response.status_code, 409,
-            msg="response code SHOULD BE 201 (Created)"
-        )
         response_in_json = json.loads(
             response.data.decode('utf-8').replace("'", "\""))
         self.assertIn("status", response_in_json)

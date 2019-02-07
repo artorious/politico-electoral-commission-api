@@ -11,6 +11,7 @@ PARTY_BP_V1 = Blueprint("v1_party", __name__, url_prefix="/api/v1")
 def parties():
     """
         Create a political party - POST
+        Fetch all political parties - GET
     """
     custom_response = None
     if request.method == "POST":
