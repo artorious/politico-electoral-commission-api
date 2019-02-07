@@ -77,7 +77,6 @@ class PoliticalOffices:
 
         return office_already_present
 
-
     @staticmethod
     def get_all_offices():
         """ Fetch all parties """
@@ -96,3 +95,19 @@ class PoliticalOffices:
                 "data": POLITICAL_OFFICES
             }
         return custom_msg
+
+    @staticmethod
+    def check_id_exists(pid):
+        """ Check that provided id """
+        global POLITICAL_OFFICES
+
+        if pid in [office["id"] for office in POLITICAL_OFFICES]:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def fetch_an_office(pid):
+        """ Fetch a political office by ID"""
+        global POLITICAL_OFFICES
+        return [office for office in POLITICAL_OFFICES if office['id'] == pid]
