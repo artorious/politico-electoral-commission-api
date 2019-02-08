@@ -55,11 +55,9 @@ def parties():
     return custom_response
 
 
-@PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET"])
+@PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET", "DELETE"])
 def party(pid):
-    """
-    GET -> Fetch political party by ID
-    """
+    """(GET)Fetch and (DELETE) purge a political party  by ID """
     custom_response = None
 
     if request.method == "GET":
@@ -80,8 +78,23 @@ def party(pid):
                 "status": "Failed",
                 "error": "ID cannot be zero or negative"
             }), 400
-    else:
-        pass
+    elif request.method == "DELETE":
+        if isinstance(pid, int) and pid >= 1:
+            if PoliticalParties.check_id_exists(pid) is True:
+                custom_response = jsonify({
+                    "status": 200,
+                    "data": PoliticalParties.delete_party(pid)
+                }), 200
+            else:
+                custom_response = jsonify({
+                    "status": 416,
+                    "error": "ID out of range. Requested Range Not Satisfiable"
+                }), 416
+        elif pid < 1:
+            custom_response = jsonify({
+                "status": "Failed",
+                "error": "ID cannot be zero or negative"
+            }), 400
 
     return custom_response
 

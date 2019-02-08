@@ -181,11 +181,6 @@ class TestFetchingParty(TestPartiesRoutes):
         self.assertIn("data", str(response.data))
         self.assertIn("status", str(response.data))
 
-    def test_fetching_a_party_by_id_with_a_valid_and_existing_id(self):
-        """ Test the fetching of a single party using it's id """
-        response = self.client().get('/api/v1/parties/1')
-        self.assertEqual(response.status_code, 200, msg="Should be 200(ok)")
-        self.assertIn("status", str(response.data))
 
     def test_fetching_a_party_with_a_negative_id_value(self):
         """ Test with a negative integer """
@@ -264,30 +259,6 @@ class TestFetchingParty(TestPartiesRoutes):
 
 class TestEditParty(TestPartiesRoutes):
     """ Test for editing a political party by ID """
-    def test_edit_party_with_valid_id_and_valid_name(self):
-        """ Test party name update with valid user data """
-        response = self.client().post(
-            "/api/v1/parties",
-            data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
-        )
-
-        valid_update_data = {"name": "Ford Asili"}
-        response = self.client().patch(
-            "/api/v1/parties/1/name",
-            data=json.dumps(valid_update_data),
-            headers={'content-type': 'application/json'}
-        )
-        deserialized_response = json.loads(response.data.decode())
-        self.assertEqual(
-            response.status_code, 200,
-            msg="Should be 200(ok)"
-        )
-        self.assertEqual(
-            deserialized_response["data"],
-            [{"id": 1, "name": "Ford Asili"}],
-            msg="Response Body Contents- Should be new name "
-        )
 
     def test_edit_party_with_non_integer_id_and_valid_name(self):
         """ Test invalid type for party ID throws a 404 code """
@@ -392,51 +363,6 @@ class TestEditParty(TestPartiesRoutes):
             msg="Response Body Contents- Should be custom message "
         )
 
-    def test_edit_party_with_valid_id_and_empty_name_str(self):
-        """ Test an empty string or a single character string is handled
-            422 - unprocessable
-        """
-        response = self.client().post(
-            "/api/v1/parties",
-            data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
-        )
-
-        empty_str_update_data = {"name": "       "}
-        response = self.client().patch(
-            "/api/v1/parties/1/name",
-            data=json.dumps(empty_str_update_data),
-            headers={'content-type': 'application/json'}
-        )
-
-        deserialized_response = json.loads(response.data.decode())
-        self.assertEqual(
-            response.status_code, 422,
-            msg="response code SHOULD BE 422 (Unprocessable Entity)"
-        )
-        self.assertEqual(
-            deserialized_response["error"],
-            "Name cannot be empty/space or 1 letter",
-            msg="Response Body Contents- Should be custom message "
-        )
-
-        empty_str_update_data_2 = {"name": ""}
-        response = self.client().patch(
-            "/api/v1/parties/1/name",
-            data=json.dumps(empty_str_update_data_2),
-            headers={'content-type': 'application/json'}
-        )
-
-        deserialized_response = json.loads(response.data.decode())
-        self.assertEqual(
-            response.status_code, 422,
-            msg="response code SHOULD BE 422 (Unprocessable Entity)"
-        )
-        self.assertEqual(
-            deserialized_response["error"],
-            "Name cannot be empty/space or 1 letter",
-            msg="Response Body Contents- Should be custom message "
-        )
 
     def test_edit_party_with_with_valid_id_and_empty_name_field(self):
         """ 400 no paylaod"""
@@ -517,6 +443,82 @@ class TestEditParty(TestPartiesRoutes):
             "ID cannot be zero",
             msg="Response Body Contents- Should be custom message "
         )
+
+
+class TestDeleteParty(TestPartiesRoutes):
+    """ Test cases for deleting a party """
+
+    # def test_deleting_party_with_valid_id(self):
+        # """ Test that a valid ID is DELETED """
+        # response = self.client().post(
+            # "/api/v1/parties",
+            # data=json.dumps(self.party_reg_data),
+            # headers={'content-type': 'application/json'}
+        # )
+
+        # response = self.client().delete('/api/v1/parties/1')
+        # self.assertEqual(response.status_code, 200, msg="Should be 200(ok)")
+        # self.assertIn("status", str(response.data))
+
+
+    def test_deleting_party_with_a_negative_id(self):
+        """ Test deleting with a negative ID"""
+        response = self.client().delete("/api/v1/parties/-1")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404, msg="Should be 404 - (Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_deleting_party_with_an_out_of_bound_id(self):
+        """ Test with a integer that is out of bound (416 - Out of range)"""
+
+        response = self.client().delete("/api/v1/parties/1000")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 416, msg="Should be 416 - Out of range"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "ID out of range. Requested Range Not Satisfiable",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_with_non_int_as_id(self):
+        """ Try to delete with an ID that isnt an int """
+        response = self.client().delete("/api/v1/parties/one")
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not Found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_test_with_float_as_id(self):
+        """ Test Deleting with a floating point ID"""
+        response = self.client().delete("/api/v1/parties/1.0")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
 
 
 if __name__ == "__main__":

@@ -84,7 +84,6 @@ class TestPolticalParties(unittest.TestCase):
 
     def test_that_id_look_up_is_done_before_fetching(self):
         """ Test that method checks that the id value exists"""
-        # try ferching an obnoxious no.
         self.assertFalse(self.test_data.check_id_exists(1000000000000))
 
     def test_fetching_a_party_by_id_returns_data(self):
@@ -100,6 +99,13 @@ class TestPolticalParties(unittest.TestCase):
             PoliticalParties.edit_party(valid_update_data, 1),
             msg="Expected Success status and new name")
 
+    def test_delete_party_opertaion_and_return_message(self):
+        """ Tests atha operation returns message to user"""
+        self.test_data.create_party()
+        self.assertEqual(
+            {'status': 200, 'data': [{'message': 'Party No. 1 deleted succesfully'}]},
+            PoliticalParties.delete_party(1),
+            msg="Expected Success status and new name")
 
 if __name__ == "__main__":
     unittest.main()
