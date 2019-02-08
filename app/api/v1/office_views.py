@@ -9,14 +9,12 @@ OFFICE_BP_V1 = Blueprint("v1_office", __name__, url_prefix="/api/v1")
 
 @OFFICE_BP_V1.route("/offices", methods=["POST", "GET"])
 def offices():
-    """ Create a political party - POST
-        Fetch all political offices - GET
+    """ Create a political office(POST) and Fetch all political offices (GET)
     """
     custom_response = None
     if request.method == "POST":
         office_reg_data = request.get_json(force=True)
         sample_office = PoliticalOffices(office_reg_data)
-        # Check for no. of dict items
         if len(office_reg_data) > 2:
             custom_response = jsonify({
                 "status": 400,
@@ -60,7 +58,7 @@ def offices():
     return custom_response
 
 @OFFICE_BP_V1.route("/offices/<int:pid>", methods=["GET"])
-def party(pid):
+def office(pid):
     """Fetch political office by ID """
     custom_response = None
 

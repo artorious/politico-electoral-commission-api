@@ -55,11 +55,9 @@ def parties():
     return custom_response
 
 
-@PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET"])
+@PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET", "DELETE"])
 def party(pid):
-    """
-    GET -> Fetch political party by ID
-    """
+    """(GET)Fetch and (DELETE) prurge a political party  by ID """
     custom_response = None
 
     if request.method == "GET":
@@ -80,8 +78,25 @@ def party(pid):
                 "status": "Failed",
                 "error": "ID cannot be zero or negative"
             }), 400
-    else:
+    elif request.method == "DELETE":
         pass
+        # Response Spec:
+# ```
+# {
+    # “status” : Integer ,
+    # “data” : [
+         # {
+              # “message” : String
+           # }
+    # ]
+# }
+# ```
+# or
+# ```
+# {
+    # “status” : integer ,
+    # “error” : “String: relevant-error-message”
+# }
 
     return custom_response
 

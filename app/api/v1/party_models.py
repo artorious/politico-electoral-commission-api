@@ -129,3 +129,7 @@ class PoliticalParties:
                 party['name'] = user_data["name"]
 
         return [{"id": pid, "name": user_data["name"]}]
+
+    @staticmethod
+    def delete_party(pid):
+        pass
