@@ -36,6 +36,7 @@ def create_app(config_mode):
     from app.api.v1 import office_views
     # Register Blueprints
     app.register_blueprint(party_views.PARTY_BP_V1)
+    app.register_blueprint(party_views.DOC_BP_V1)
     app.register_blueprint(office_views.OFFICE_BP_V1)
     # Custom error handlers
     app.register_error_handler(404, page_not_found_error)
