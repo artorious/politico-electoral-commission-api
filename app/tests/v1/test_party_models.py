@@ -103,7 +103,7 @@ class TestPolticalParties(unittest.TestCase):
         """ Tests atha operation returns message to user"""
         self.test_data.create_party()
         self.assertEqual(
-            {"message": "Party deleted successfully"},
+            {'status': 200, 'data': [{'message': 'Party No. 1 deleted succesfully'}]},
             PoliticalParties.delete_party(1),
             msg="Expected Success status and new name")
 

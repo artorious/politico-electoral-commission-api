@@ -14,6 +14,7 @@ A web application platform which both the politicians and citizens can use. Poli
 `/api/v1/parties` | `POST` | Create a political party
 `/api/v1/parties` | `GET`| Fetch all political parties
 `/api/v1/parties/<int:id>` | `GET` |   Fetch a specific political party
+`/api/v1/parties/<int:id>` | `DELETE` |   Delete a specific political party
 `/api/v1/<int:id>/name` | `PATCH` | Edit a political party
 `/app/api/v1/offices` | `POST`| Create Political office
 `/api/v1/offices` | `GET` | Fetch all political offices

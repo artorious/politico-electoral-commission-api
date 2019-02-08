@@ -132,4 +132,11 @@ class PoliticalParties:
 
     @staticmethod
     def delete_party(pid):
-        pass
+        """ Delete a political party by ID"""
+        global POLITICAL_PARTIES
+        POLITICAL_PARTIES = [party for party in POLITICAL_PARTIES if party['id'] != pid]
+        return {
+        "status": 200, "data": [
+            {"message": f"Party No. {pid} deleted succesfully"}
+            ]
+        }
