@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """ App Factory """
-from flask import Flask, jsonify
+from flask import Flask, jsonify, redirect
 from instance.config import app_config
 
 # Custom error handlers
@@ -36,12 +36,17 @@ def create_app(config_mode):
     from app.api.v1 import office_views
     # Register Blueprints
     app.register_blueprint(party_views.PARTY_BP_V1)
-    app.register_blueprint(party_views.DOC_BP_V1)
     app.register_blueprint(office_views.OFFICE_BP_V1)
     # Custom error handlers
     app.register_error_handler(404, page_not_found_error)
     app.register_error_handler(400, bad_user_request_error)
     app.register_error_handler(500, server_side_error)
+
+
+    @app.route("/")
+    def home():
+        """ Home - Docs"""
+        return redirect("https://documenter.getpostman.com/view/3796196/RztoKnTh#8203e67f-3ebe-4409-8e1b-85b0554d4773", code=302)
     return app
 
 

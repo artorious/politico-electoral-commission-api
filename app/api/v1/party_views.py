@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """ Political party views """
-from flask import Blueprint, jsonify, redirect, request
+from flask import Blueprint, jsonify, request
 from app.api.v1.party_models import PoliticalParties
 
 PARTY_BP_V1 = Blueprint("v1_party", __name__, url_prefix="/api/v1")
-DOC_BP_V1 = Blueprint("local", __name__, url_prefix="/")
+
 
 @PARTY_BP_V1.route("/parties", methods=["POST", "GET"])
 def parties():
@@ -134,8 +134,3 @@ def party_manager(pid):
 
     return custom_response
 
-
-@DOC_BP_V1.route("", methods=["GET"])
-def docs():
-    """ Redirects to postman documentation"""
-    return redirect("https://documenter.getpostman.com/view/3796196/RztoKnTh#8203e67f-3ebe-4409-8e1b-85b0554d4773", code=302)
