@@ -1,4 +1,4 @@
-#!/usr.bin/env python3
+#!/usr/bin/env python3
 """ Runner"""
 import os
 from app import create_app
