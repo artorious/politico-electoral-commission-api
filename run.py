@@ -7,4 +7,4 @@ config_mode = os.getenv("APP_SETTINGS")
 app = create_app(config_mode)
 
 if __name__ == "__main__":
-    app.run(host='localhost', port=5000)
+    app.run()
