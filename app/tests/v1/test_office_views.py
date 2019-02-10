@@ -150,7 +150,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Office already exists",
+            "Conflict - Entity already exists",
             msg="Response Body Contents- Should be custom message "
         )
 
