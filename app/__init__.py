@@ -26,7 +26,7 @@ def server_side_error(err):
     }), 500
 
 
-def create_app(config_mode="testing"):
+def create_app(config_mode):
     app = Flask(__name__, instance_relative_config=True)
     # config file loading
     app.config.from_object(app_config[config_mode])
