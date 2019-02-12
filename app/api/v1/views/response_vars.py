@@ -42,5 +42,3 @@ expected_party_fields = ["name", "hqAddress", "logoUrl", "Party members"]
 
 expected_office_fields = ["name", "type"]
 
-
-
