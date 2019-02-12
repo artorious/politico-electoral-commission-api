@@ -12,7 +12,6 @@ PARTY_BP_V1 = Blueprint("v1_party", __name__, url_prefix="/api/v1")
 
 
 
-
 @PARTY_BP_V1.route("/parties", methods=["POST", "GET"])
 def parties():
     """
@@ -25,20 +24,15 @@ def parties():
     else:
         party_reg_data = request.get_json(force=True)
         sample_party = PoliticalParties(party_reg_data)
+
         if len(party_reg_data) > 4:
             custom_response = jsonify(more_data_fields_response), 400
         elif len(party_reg_data) < 4:
             custom_response = jsonify(few_data_fields_response), 400
-        elif sample_party.check_for_expected_value_types() is False:
-            custom_response = jsonify(unprocessable_data_response), 422
-        elif sample_party.check_for_any_empty_fields() is False:
-            custom_response = jsonify(empty_data_field_response), 422
-        elif sample_party.check_whether_party_exists(
-                party_reg_data["name"]) is True:
-            custom_response = jsonify(entity_already_exists_response), 409
-        else:
-            custom_response = jsonify(sample_party.create_party()), 201
 
+        elif sample_party.party_reg_validadion() is None:
+            custom_response = jsonify(sample_party.create_party()), 201
+        else: custom_response = sample_party.party_reg_validadion()
     return custom_response
 
 

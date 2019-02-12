@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """ Models Office Information """
 import time
+from flask import jsonify
+from app.api.v1.views.response_vars import (
+    more_data_fields_response, few_data_fields_response,
+    unprocessable_data_response, empty_data_field_response,
+    entity_already_exists_response, id_out_of_range_response,
+    id_cannot_be_zero_response
+)
 
 POLITICAL_OFFICES = []
 OFFICE_COUNT = 1
@@ -111,3 +118,16 @@ class PoliticalOffices:
         """ Fetch a political office by ID"""
         global POLITICAL_OFFICES
         return [office for office in POLITICAL_OFFICES if office['id'] == pid]
+
+    def office_reg_validadion(self):
+        custom_response = None
+        if self.check_for_only_expected_value_types() is False:
+            custom_response = jsonify(unprocessable_data_response), 422
+        elif self.check_any_for_empty_fields() is False:
+            custom_response = jsonify(empty_data_field_response), 422
+        elif self.check_whether_office_exists(
+            self.office_reg_data["name"]) is True:
+            custom_response = jsonify(entity_already_exists_response), 409
+        return custom_response
+
+

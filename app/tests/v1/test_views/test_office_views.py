@@ -110,7 +110,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Unprocessable Entity - Invalid value in data field",
+            "Empty data field",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -126,7 +126,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Unprocessable Entity - Invalid value in data field",
+            "Empty data field",
             msg="Response Body Contents- Should be custom message "
         )
 
