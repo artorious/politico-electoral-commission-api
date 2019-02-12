@@ -5,8 +5,7 @@ from flask import Blueprint, jsonify, request
 from app.api.v1.models.office_models import PoliticalOffices
 from app.api.v1.views.response_vars import (
     more_data_fields_response, few_data_fields_response,
-    unprocessable_data_response, entity_already_exists_response,
-    id_out_of_range_response, id_cannot_be_zero_response, expected_offices
+    id_out_of_range_response, id_cannot_be_zero_response
 )
 
 OFFICE_BP_V1 = Blueprint("v1_office", __name__, url_prefix="/api/v1")
@@ -26,7 +25,8 @@ def offices():
             custom_response = jsonify(few_data_fields_response), 400
         elif sample_office.office_reg_validadion() is None:
             custom_response = jsonify(sample_office.create_office()), 201
-        else: custom_response = sample_office.office_reg_validadion()
+        else:
+            custom_response = sample_office.office_reg_validadion()
     else:
         custom_response = jsonify(PoliticalOffices.get_all_offices())
 
