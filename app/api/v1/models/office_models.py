@@ -15,7 +15,7 @@ OFFICE_COUNT = 1
 
 class PoliticalOffices(ValidationHelper):
     """ Methods to handle office related data"""
-    def __init__(self, office_reg_data):
+    def __init__(self, office_reg_data=None):
         self.office_reg_data = office_reg_data
 
     def create_office(self):
@@ -79,24 +79,10 @@ class PoliticalOffices(ValidationHelper):
         global POLITICAL_OFFICES
         return super().check_whether_entity_exists(name, POLITICAL_OFFICES)
 
-    @staticmethod
-    def get_all_offices():
+    def get_all_offices(self):
         """ Fetch all parties """
         global POLITICAL_OFFICES
-        custom_msg = None
-
-        if POLITICAL_OFFICES == []:
-            custom_msg = {
-                "status": 200,
-                "data": "The Office list is empty"
-            }
-
-        else:
-            custom_msg = {
-                "status": 200,
-                "data": POLITICAL_OFFICES
-            }
-        return custom_msg
+        return super().fetch_all_entities(POLITICAL_OFFICES)
 
     @staticmethod
     def check_id_exists(pid):

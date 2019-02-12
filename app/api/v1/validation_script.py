@@ -54,3 +54,12 @@ class ValidationHelper:
                 entity_already_present = True
 
         return entity_already_present
+
+    def fetch_all_entities(self, entities_list):
+        """ Fetch all Entities in the list """
+        custom_msg = None
+        if entities_list == []:
+            custom_msg = {"status": 200, "data": "The List is empty"}
+        else:
+            custom_msg = {"status": 200, "data": entities_list}
+        return custom_msg

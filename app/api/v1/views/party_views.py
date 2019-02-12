@@ -13,7 +13,8 @@ PARTY_BP_V1 = Blueprint("v1_party", __name__, url_prefix="/api/v1")
 @PARTY_BP_V1.route("/parties", methods=["GET"])
 def fetch_all_parties():
     """ Fetch all political parties """
-    return jsonify(PoliticalParties.get_all_parties())
+    dummy_instance = PoliticalParties()
+    return jsonify(dummy_instance.get_all_parties())
 
 
 @PARTY_BP_V1.route("/parties", methods=["POST"])

@@ -17,7 +17,7 @@ PARTY_COUNT = 1
 
 class PoliticalParties(ValidationHelper):
     """ Methods to model party information """
-    def __init__(self, party_reg_data):
+    def __init__(self, party_reg_data=None):
         self.party_reg_data = party_reg_data
 
     def create_party(self):
@@ -81,24 +81,10 @@ class PoliticalParties(ValidationHelper):
         global POLITICAL_PARTIES
         return super().check_whether_entity_exists(name, POLITICAL_PARTIES)
 
-    @staticmethod
-    def get_all_parties():
+    def get_all_parties(self):
         """ Fetch all parties """
         global POLITICAL_PARTIES
-        custom_msg = None
-
-        if POLITICAL_PARTIES == []:
-            custom_msg = {
-                "status": 200,
-                "data": "The Party list is empty"
-            }
-
-        else:
-            custom_msg = {
-                "status": 200,
-                "data": POLITICAL_PARTIES
-            }
-        return custom_msg
+        return super().fetch_all_entities(POLITICAL_PARTIES)
 
     @staticmethod
     def check_id_exists(pid):

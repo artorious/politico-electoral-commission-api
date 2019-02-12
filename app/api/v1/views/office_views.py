@@ -14,7 +14,8 @@ OFFICE_BP_V1 = Blueprint("v1_office", __name__, url_prefix="/api/v1")
 @OFFICE_BP_V1.route("/offices", methods=["GET"])
 def fetch_all_offices():
     """ Fetch all political offices (GET) """
-    return jsonify(PoliticalOffices.get_all_offices())
+    dummy_instance = PoliticalOffices()
+    return jsonify(dummy_instance.get_all_offices())
 
 
 @OFFICE_BP_V1.route("/offices", methods=["POST"])
