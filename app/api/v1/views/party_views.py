@@ -10,59 +10,62 @@ from app.api.v1.views.response_vars import (
 PARTY_BP_V1 = Blueprint("v1_party", __name__, url_prefix="/api/v1")
 
 
-@PARTY_BP_V1.route("/parties", methods=["POST", "GET"])
-def parties():
-    """
-        Create a political party - POST
-        Fetch all political parties - GET
-    """
+@PARTY_BP_V1.route("/parties", methods=["GET"])
+def fetch_all_parties():
+    """ Fetch all political parties """
+    return jsonify(PoliticalParties.get_all_parties())
+
+
+@PARTY_BP_V1.route("/parties", methods=["POST"])
+def create_a_party():
+    """ Fetch all political parties """
     custom_response = None
-    if request.method == "GET":
-        custom_response = jsonify(PoliticalParties.get_all_parties())
+
+    party_reg_data = request.get_json(force=True)
+    sample_party = PoliticalParties(party_reg_data)
+
+    if len(party_reg_data) > 4:
+        custom_response = jsonify(more_data_fields_response), 400
+    elif len(party_reg_data) < 4:
+        custom_response = jsonify(few_data_fields_response), 400
+
+    elif sample_party.party_reg_validadion() is None:
+        custom_response = jsonify(sample_party.create_party()), 201
     else:
-        party_reg_data = request.get_json(force=True)
-        sample_party = PoliticalParties(party_reg_data)
-
-        if len(party_reg_data) > 4:
-            custom_response = jsonify(more_data_fields_response), 400
-        elif len(party_reg_data) < 4:
-            custom_response = jsonify(few_data_fields_response), 400
-
-        elif sample_party.party_reg_validadion() is None:
-            custom_response = jsonify(sample_party.create_party()), 201
-        else:
-            custom_response = sample_party.party_reg_validadion()
+        custom_response = sample_party.party_reg_validadion()
     return custom_response
 
-
-@PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET", "DELETE"])
-def party(pid):
-    """(GET)Fetch and (DELETE) purge a political party  by ID """
+@PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET"])
+def fetch_a_party(pid):
+    """(Fetch a political party  by ID """
     custom_response = None
-
-    if request.method == "GET":
-
-        if pid >= 1:
-            if PoliticalParties.check_id_exists(pid) is True:
-                custom_response = jsonify({
-                    "status": 200,
-                    "data": PoliticalParties.fetch_a_party(pid)
-                }), 200
-            else:
-                custom_response = jsonify(id_out_of_range_response), 416
+    if pid >= 1:
+        if PoliticalParties.check_id_exists(pid) is True:
+            custom_response = jsonify({
+                "status": 200,
+                "data": PoliticalParties.fetch_a_party(pid)
+            }), 200
         else:
-            custom_response = jsonify(id_cannot_be_zero_response), 400
+            custom_response = jsonify(id_out_of_range_response), 416
     else:
-        if pid >= 1:
-            if PoliticalParties.check_id_exists(pid) is True:
-                custom_response = jsonify({
-                    "status": 200,
-                    "data": PoliticalParties.delete_party(pid)
-                }), 200
-            else:
-                custom_response = jsonify(id_out_of_range_response), 416
+        custom_response = jsonify(id_cannot_be_zero_response), 400
+
+    return custom_response
+
+@PARTY_BP_V1.route("/parties/<int:pid>", methods=["DELETE"])
+def delete_a_party(pid):
+    """DELETE a political party  by ID """
+    custom_response = None
+    if pid >= 1:
+        if PoliticalParties.check_id_exists(pid) is True:
+            custom_response = jsonify({
+                "status": 200,
+                "data": PoliticalParties.delete_party(pid)
+            }), 200
         else:
-            custom_response = jsonify(id_cannot_be_zero_response), 400
+            custom_response = jsonify(id_out_of_range_response), 416
+    else:
+        custom_response = jsonify(id_cannot_be_zero_response), 400
 
     return custom_response
 
