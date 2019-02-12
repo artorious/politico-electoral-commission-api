@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ Tests for models"""
 import unittest
-from app.api.v1.party_models import PoliticalParties
+from app.api.v1.models.party_models import PoliticalParties
 
 
 class TestPolticalParties(unittest.TestCase):

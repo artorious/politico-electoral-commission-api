@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """ Political party views """
 from flask import Blueprint, jsonify, request
-from app.api.v1.party_models import PoliticalParties
-from app.api.v1.validator import (
+from app.api.v1.models.party_models import PoliticalParties
+from app.api.v1.views.response_vars import (
     more_data_fields_response, few_data_fields_response,
     unprocessable_data_response, empty_data_field_response,
     entity_already_exists_response, id_out_of_range_response,
