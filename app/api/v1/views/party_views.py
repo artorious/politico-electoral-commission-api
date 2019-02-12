@@ -10,6 +10,7 @@ from app.api.v1.validation_script import (
 PARTY_BP_V1 = Blueprint("v1_party", __name__, url_prefix="/api/v1")
 dummy_instance = PoliticalParties()
 
+
 @PARTY_BP_V1.route("/parties", methods=["GET"])
 def fetch_all_parties():
     """ Fetch all political parties """
@@ -42,9 +43,9 @@ def fetch_a_party(pid):
     custom_response = resolve(pid)
     if resolve(pid) is True:
         custom_response = jsonify({
-                "status": 200,
-                "data": dummy_instance.fetch_a_party(pid)
-            }), 200
+            "status": 200,
+            "data": dummy_instance.fetch_a_party(pid)
+        }), 200
     return custom_response
 
 
@@ -81,7 +82,6 @@ def party_manager(pid):
             "data": PoliticalParties.edit_party(party_updates, pid)
             }), 200
     return custom_response
-
 
 
 def resolve(pid):
