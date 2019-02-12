@@ -40,8 +40,9 @@ def create_an_offices():
 def office(pid):
     """Fetch political office by ID """
     custom_response = None
+    dummy_instance = PoliticalOffices()
     if pid >= 1:
-        if PoliticalOffices.check_id_exists(pid) is True:
+        if dummy_instance.check_id_exists(pid) is True:
             custom_response = jsonify({
                 "status": 200,
                 "data": PoliticalOffices.fetch_an_office(pid)

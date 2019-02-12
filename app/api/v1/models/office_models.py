@@ -84,15 +84,10 @@ class PoliticalOffices(ValidationHelper):
         global POLITICAL_OFFICES
         return super().fetch_all_entities(POLITICAL_OFFICES)
 
-    @staticmethod
-    def check_id_exists(pid):
+    def check_id_exists(self, pid):
         """ Check that provided id """
         global POLITICAL_OFFICES
-
-        if pid in [office["id"] for office in POLITICAL_OFFICES]:
-            return True
-        else:
-            return False
+        return super().lookup_if_entity_id_exists(pid, POLITICAL_OFFICES)
 
     @staticmethod
     def fetch_an_office(pid):

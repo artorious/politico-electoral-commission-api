@@ -41,11 +41,12 @@ def create_a_party():
 def fetch_a_party(pid):
     """(Fetch a political party  by ID """
     custom_response = None
+    dummy_instance = PoliticalParties()
     if pid >= 1:
-        if PoliticalParties.check_id_exists(pid) is True:
+        if dummy_instance.check_id_exists(pid) is True:
             custom_response = jsonify({
                 "status": 200,
-                "data": PoliticalParties.fetch_a_party(pid)
+                "data": dummy_instance.fetch_a_party(pid)
             }), 200
         else:
             custom_response = jsonify(id_out_of_range_response), 416
@@ -59,8 +60,9 @@ def fetch_a_party(pid):
 def delete_a_party(pid):
     """DELETE a political party  by ID """
     custom_response = None
+    dummy_instance = PoliticalParties()
     if pid >= 1:
-        if PoliticalParties.check_id_exists(pid) is True:
+        if dummy_instance.check_id_exists(pid) is True:
             custom_response = jsonify({
                 "status": 200,
                 "data": PoliticalParties.delete_party(pid)
@@ -77,13 +79,14 @@ def delete_a_party(pid):
 def party_manager(pid):
     """ Edit politcal party  name by ID"""
     custom_response = None
+    dummy_instance = PoliticalParties()
     party_updates = request.get_json(force=True)
 
     if len(party_updates) != 1:
         custom_response = jsonify(more_data_fields_response), 400
     elif pid < 1:
         custom_response = jsonify(id_cannot_be_zero_response), 400
-    elif PoliticalParties.check_id_exists(pid) is False:
+    elif dummy_instance.check_id_exists(pid) is False:
         custom_response = jsonify(id_out_of_range_response), 416
     elif PoliticalParties.check_for_valid_party_name(party_updates["name"]):
         custom_response = jsonify(empty_data_field_response), 422

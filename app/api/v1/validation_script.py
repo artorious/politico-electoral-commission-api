@@ -63,3 +63,10 @@ class ValidationHelper:
         else:
             custom_msg = {"status": 200, "data": entities_list}
         return custom_msg
+
+    def lookup_if_entity_id_exists(self, entity_pid, entities_list):
+        """ Check that provided id """
+        if entity_pid in [entity["id"] for entity in entities_list]:
+            return True
+        else:
+            return False

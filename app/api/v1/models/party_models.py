@@ -86,15 +86,14 @@ class PoliticalParties(ValidationHelper):
         global POLITICAL_PARTIES
         return super().fetch_all_entities(POLITICAL_PARTIES)
 
-    @staticmethod
-    def check_id_exists(pid):
+    def check_id_exists(self, pid):
         """ Check that provided id """
         global POLITICAL_PARTIES
-
-        if pid in [party["id"] for party in POLITICAL_PARTIES]:
-            return True
-        else:
-            return False
+        return super().lookup_if_entity_id_exists(pid, POLITICAL_PARTIES)
+        # if pid in [party["id"] for party in POLITICAL_PARTIES]:
+            # return True
+        # else:
+            # return False
 
     @staticmethod
     def fetch_a_party(pid):
