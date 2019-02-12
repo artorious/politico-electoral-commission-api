@@ -42,3 +42,15 @@ expected_party_fields = ["name", "hqAddress", "logoUrl", "Party members"]
 
 expected_office_fields = ["name", "type"]
 
+
+
+class ValidationHelper:
+
+    def check_whether_entity_exists(self, entity_name, entity_list):
+        """ Returns True if the office exists, else False"""
+        entity_already_present = False
+        for each_entity in entity_list:
+            if each_entity["name"] == entity_name:
+                entity_already_present = True
+
+        return entity_already_present

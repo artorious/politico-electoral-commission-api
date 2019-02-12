@@ -3,18 +3,19 @@
 
 import time
 from flask import jsonify
-from app.api.v1.views.response_vars import (
+from app.api.v1.validation_script import (
     more_data_fields_response, few_data_fields_response,
     unprocessable_data_response, empty_data_field_response,
     entity_already_exists_response, id_out_of_range_response,
-    id_cannot_be_zero_response
+    id_cannot_be_zero_response, ValidationHelper
 )
+
 
 POLITICAL_PARTIES = []
 PARTY_COUNT = 1
 
 
-class PoliticalParties:
+class PoliticalParties(ValidationHelper):
     """ Methods to model party information """
     def __init__(self, party_reg_data):
         self.party_reg_data = party_reg_data
@@ -74,15 +75,11 @@ class PoliticalParties:
             custom_msg = False
         return custom_msg
 
-    @staticmethod
-    def check_whether_party_exists(name):
-        """ Handle double registartion """
-        party_already_present = False
-        for each_party in POLITICAL_PARTIES:
-            if each_party["name"] == name:
-                party_already_present = True
 
-        return party_already_present
+    def check_whether_party_exists(self, name):
+        """ Handle double registartion """
+        global POLITICAL_PARTIES
+        return super().check_whether_entity_exists(name, POLITICAL_PARTIES)
 
     @staticmethod
     def get_all_parties():
@@ -148,7 +145,7 @@ class PoliticalParties:
             ]
         }
 
-    def party_reg_validadion(self):
+    def party_reg_validation(self):
         custom_response = None
         if self.check_for_expected_value_types() is False:
             custom_response = jsonify(unprocessable_data_response), 422

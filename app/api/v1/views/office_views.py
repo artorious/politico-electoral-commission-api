@@ -3,7 +3,7 @@
 
 from flask import Blueprint, jsonify, request
 from app.api.v1.models.office_models import PoliticalOffices
-from app.api.v1.views.response_vars import (
+from app.api.v1.validation_script import (
     more_data_fields_response, few_data_fields_response,
     id_out_of_range_response, id_cannot_be_zero_response
 )
@@ -27,10 +27,10 @@ def create_an_offices():
         custom_response = jsonify(more_data_fields_response), 400
     elif len(office_reg_data) < 2:
         custom_response = jsonify(few_data_fields_response), 400
-    elif sample_office.office_reg_validadion() is None:
+    elif sample_office.office_reg_validation() is None:
         custom_response = jsonify(sample_office.create_office()), 201
     else:
-        custom_response = sample_office.office_reg_validadion()
+        custom_response = sample_office.office_reg_validation()
 
     return custom_response
 

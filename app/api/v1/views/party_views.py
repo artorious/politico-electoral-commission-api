@@ -2,7 +2,7 @@
 """ Political party views """
 from flask import Blueprint, jsonify, request
 from app.api.v1.models.party_models import PoliticalParties
-from app.api.v1.views.response_vars import (
+from app.api.v1.validation_script import (
     more_data_fields_response, few_data_fields_response,
     empty_data_field_response, id_out_of_range_response,
     id_cannot_be_zero_response
@@ -29,10 +29,10 @@ def create_a_party():
     elif len(party_reg_data) < 4:
         custom_response = jsonify(few_data_fields_response), 400
 
-    elif sample_party.party_reg_validadion() is None:
+    elif sample_party.party_reg_validation() is None:
         custom_response = jsonify(sample_party.create_party()), 201
     else:
-        custom_response = sample_party.party_reg_validadion()
+        custom_response = sample_party.party_reg_validation()
     return custom_response
 
 
