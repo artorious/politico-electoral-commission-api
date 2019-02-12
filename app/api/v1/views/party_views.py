@@ -76,7 +76,7 @@ def party_manager(pid):
     custom_response = None
     party_updates = request.get_json(force=True)
 
-    if "name" not in party_updates or len(party_updates) != 1:
+    if len(party_updates) != 1:
         custom_response = jsonify(more_data_fields_response), 400
     elif pid < 1:
         custom_response = jsonify(id_cannot_be_zero_response), 400
