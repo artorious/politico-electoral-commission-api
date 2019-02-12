@@ -36,16 +36,16 @@ def create_an_offices():
     return custom_response
 
 
-@OFFICE_BP_V1.route("/offices/<int:pid>", methods=["GET"])
-def office(pid):
+@OFFICE_BP_V1.route("/offices/<int:oid>", methods=["GET"])
+def office(oid):
     """Fetch political office by ID """
     custom_response = None
     dummy_instance = PoliticalOffices()
-    if pid >= 1:
-        if dummy_instance.check_id_exists(pid) is True:
+    if oid >= 1:
+        if dummy_instance.check_id_exists(oid) is True:
             custom_response = jsonify({
                 "status": 200,
-                "data": dummy_instance.fetch_an_office(pid)
+                "data": dummy_instance.fetch_an_office(oid)
             }), 200
         else:
             custom_response = jsonify(id_out_of_range_response), 416

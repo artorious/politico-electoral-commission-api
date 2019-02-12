@@ -43,9 +43,8 @@ expected_party_fields = ["name", "hqAddress", "logoUrl", "Party members"]
 expected_office_fields = ["name", "type"]
 
 
-
 class QueryHelper:
-
+    """ Class contains methods to interact with entries/entities """
     def check_whether_entity_exists(self, entity_name, entity_list):
         """ Returns True if the office exists, else False"""
         entity_already_present = False
