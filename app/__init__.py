@@ -32,8 +32,8 @@ def create_app(config_mode):
     app.config.from_object(app_config[config_mode])
     app.config.from_pyfile('config.py')
     # local imports
-    from app.api.v1 import party_views
-    from app.api.v1 import office_views
+    from app.api.v1.views import party_views
+    from app.api.v1.views import office_views
     # Register Blueprints
     app.register_blueprint(party_views.PARTY_BP_V1)
     app.register_blueprint(office_views.OFFICE_BP_V1)

@@ -2,8 +2,8 @@
 """ Routes Office Information """
 
 from flask import Blueprint, jsonify, request
-from app.api.v1.office_models import PoliticalOffices
-from app.api.v1.validator import (
+from app.api.v1.models.office_models import PoliticalOffices
+from app.api.v1.views.response_vars import (
     more_data_fields_response, few_data_fields_response,
     unprocessable_data_response, entity_already_exists_response,
     id_out_of_range_response, id_cannot_be_zero_response, expected_offices
