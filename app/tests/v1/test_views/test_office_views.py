@@ -195,7 +195,7 @@ class TestFetchingOffice(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "ID out of range. Requested Range Not Satisfiable",
+            "Entity not in server. ID out of range.",
             msg="Response Body Contents- Should be custom message "
         )
 
