@@ -8,12 +8,11 @@ from app.api.v1.validation_script import (
     id_cannot_be_zero_response
 )
 PARTY_BP_V1 = Blueprint("v1_party", __name__, url_prefix="/api/v1")
-
+dummy_instance = PoliticalParties()
 
 @PARTY_BP_V1.route("/parties", methods=["GET"])
 def fetch_all_parties():
     """ Fetch all political parties """
-    dummy_instance = PoliticalParties()
     return jsonify(dummy_instance.get_all_parties())
 
 
@@ -40,38 +39,24 @@ def create_a_party():
 @PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET"])
 def fetch_a_party(pid):
     """(Fetch a political party  by ID """
-    custom_response = None
-    dummy_instance = PoliticalParties()
-    if pid >= 1:
-        if dummy_instance.check_id_exists(pid) is True:
-            custom_response = jsonify({
+    custom_response = resolve(pid)
+    if resolve(pid) is True:
+        custom_response = jsonify({
                 "status": 200,
                 "data": dummy_instance.fetch_a_party(pid)
             }), 200
-        else:
-            custom_response = jsonify(id_out_of_range_response), 416
-    else:
-        custom_response = jsonify(id_cannot_be_zero_response), 400
-
     return custom_response
 
 
 @PARTY_BP_V1.route("/parties/<int:pid>", methods=["DELETE"])
 def delete_a_party(pid):
     """DELETE a political party  by ID """
-    custom_response = None
-    dummy_instance = PoliticalParties()
-    if pid >= 1:
-        if dummy_instance.check_id_exists(pid) is True:
-            custom_response = jsonify({
-                "status": 200,
-                "data": PoliticalParties.delete_party(pid)
-            }), 200
-        else:
-            custom_response = jsonify(id_out_of_range_response), 416
-    else:
-        custom_response = jsonify(id_cannot_be_zero_response), 400
-
+    custom_response = resolve(pid)
+    if resolve(pid) is True:
+        custom_response = jsonify({
+            "status": 200,
+            "data": PoliticalParties.delete_party(pid)
+        }), 200
     return custom_response
 
 
@@ -79,7 +64,6 @@ def delete_a_party(pid):
 def party_manager(pid):
     """ Edit politcal party  name by ID"""
     custom_response = None
-    dummy_instance = PoliticalParties()
     party_updates = request.get_json(force=True)
 
     if len(party_updates) != 1:
@@ -96,5 +80,19 @@ def party_manager(pid):
             "status": 200,
             "data": PoliticalParties.edit_party(party_updates, pid)
             }), 200
+    return custom_response
+
+
+
+def resolve(pid):
+    """ Helper for validation. Checks that ID is valid int and exists """
+    custom_response = None
+    if pid >= 1:
+        if dummy_instance.check_id_exists(pid) is True:
+            custom_response = True
+        else:
+            custom_response = jsonify(id_out_of_range_response), 416
+    else:
+        custom_response = jsonify(id_cannot_be_zero_response), 400
 
     return custom_response
