@@ -34,6 +34,7 @@ def create_an_offices():
 
     return custom_response
 
+
 @OFFICE_BP_V1.route("/offices/<int:pid>", methods=["GET"])
 def office(pid):
     """Fetch political office by ID """

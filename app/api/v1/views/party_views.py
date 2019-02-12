@@ -35,6 +35,7 @@ def create_a_party():
         custom_response = sample_party.party_reg_validadion()
     return custom_response
 
+
 @PARTY_BP_V1.route("/parties/<int:pid>", methods=["GET"])
 def fetch_a_party(pid):
     """(Fetch a political party  by ID """
@@ -51,6 +52,7 @@ def fetch_a_party(pid):
         custom_response = jsonify(id_cannot_be_zero_response), 400
 
     return custom_response
+
 
 @PARTY_BP_V1.route("/parties/<int:pid>", methods=["DELETE"])
 def delete_a_party(pid):
