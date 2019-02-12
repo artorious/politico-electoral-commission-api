@@ -7,7 +7,7 @@ from app.api.v1.validation_script import (
     more_data_fields_response, few_data_fields_response,
     unprocessable_data_response, empty_data_field_response,
     entity_already_exists_response, id_out_of_range_response,
-    id_cannot_be_zero_response, ValidationHelper
+    id_cannot_be_zero_response, QueryHelper
 )
 
 
@@ -15,7 +15,7 @@ POLITICAL_PARTIES = []
 PARTY_COUNT = 1
 
 
-class PoliticalParties(ValidationHelper):
+class PoliticalParties(QueryHelper):
     """ Methods to model party information """
     def __init__(self, party_reg_data=None):
         self.party_reg_data = party_reg_data
@@ -90,16 +90,11 @@ class PoliticalParties(ValidationHelper):
         """ Check that provided id """
         global POLITICAL_PARTIES
         return super().lookup_if_entity_id_exists(pid, POLITICAL_PARTIES)
-        # if pid in [party["id"] for party in POLITICAL_PARTIES]:
-            # return True
-        # else:
-            # return False
 
-    @staticmethod
-    def fetch_a_party(pid):
+    def fetch_a_party(self, pid):
         """ Fetch a political party by ID"""
         global POLITICAL_PARTIES
-        return [party for party in POLITICAL_PARTIES if party['id'] == pid]
+        return super().fetch_an_entity_by_id(pid, POLITICAL_PARTIES)
 
     @staticmethod
     def check_for_valid_party_name(name):

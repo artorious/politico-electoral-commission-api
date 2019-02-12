@@ -6,14 +6,14 @@ from app.api.v1.validation_script import (
     more_data_fields_response, few_data_fields_response,
     unprocessable_data_response, empty_data_field_response,
     entity_already_exists_response, id_out_of_range_response,
-    id_cannot_be_zero_response, ValidationHelper
+    id_cannot_be_zero_response, QueryHelper
 )
 
 POLITICAL_OFFICES = []
 OFFICE_COUNT = 1
 
 
-class PoliticalOffices(ValidationHelper):
+class PoliticalOffices(QueryHelper):
     """ Methods to handle office related data"""
     def __init__(self, office_reg_data=None):
         self.office_reg_data = office_reg_data
@@ -89,11 +89,10 @@ class PoliticalOffices(ValidationHelper):
         global POLITICAL_OFFICES
         return super().lookup_if_entity_id_exists(pid, POLITICAL_OFFICES)
 
-    @staticmethod
-    def fetch_an_office(pid):
+    def fetch_an_office(self, pid):
         """ Fetch a political office by ID"""
         global POLITICAL_OFFICES
-        return [office for office in POLITICAL_OFFICES if office['id'] == pid]
+        return super().fetch_an_entity_by_id(pid, POLITICAL_OFFICES)
 
     def office_reg_validation(self):
         custom_response = None

@@ -45,7 +45,7 @@ def office(pid):
         if dummy_instance.check_id_exists(pid) is True:
             custom_response = jsonify({
                 "status": 200,
-                "data": PoliticalOffices.fetch_an_office(pid)
+                "data": dummy_instance.fetch_an_office(pid)
             }), 200
         else:
             custom_response = jsonify(id_out_of_range_response), 416

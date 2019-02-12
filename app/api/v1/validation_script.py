@@ -44,7 +44,7 @@ expected_office_fields = ["name", "type"]
 
 
 
-class ValidationHelper:
+class QueryHelper:
 
     def check_whether_entity_exists(self, entity_name, entity_list):
         """ Returns True if the office exists, else False"""
@@ -70,3 +70,7 @@ class ValidationHelper:
             return True
         else:
             return False
+
+    def fetch_an_entity_by_id(self, pid, entities_list):
+        """ Fetch an entity by ID"""
+        return [entity for entity in entities_list if entity['id'] == pid]
