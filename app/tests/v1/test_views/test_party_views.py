@@ -207,7 +207,7 @@ class TestFetchingParty(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "ID out of range. Requested Range Not Satisfiable",
+            "Entity not in server. ID out of range.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -305,7 +305,7 @@ class TestEditParty(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "ID out of range. Requested Range Not Satisfiable",
+            "Entity not in server. ID out of range.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -448,19 +448,6 @@ class TestEditParty(TestPartiesRoutes):
 class TestDeleteParty(TestPartiesRoutes):
     """ Test cases for deleting a party """
 
-    # def test_deleting_party_with_valid_id(self):
-        # """ Test that a valid ID is DELETED """
-        # response = self.client().post(
-            # "/api/v1/parties",
-            # data=json.dumps(self.party_reg_data),
-            # headers={'content-type': 'application/json'}
-        # )
-
-        # response = self.client().delete('/api/v1/parties/1')
-        # self.assertEqual(response.status_code, 200, msg="Should be 200(ok)")
-        # self.assertIn("status", str(response.data))
-
-
     def test_deleting_party_with_a_negative_id(self):
         """ Test deleting with a negative ID"""
         response = self.client().delete("/api/v1/parties/-1")
@@ -486,7 +473,7 @@ class TestDeleteParty(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "ID out of range. Requested Range Not Satisfiable",
+            "Entity not in server. ID out of range.",
             msg="Response Body Contents- Should be custom message "
         )
 
