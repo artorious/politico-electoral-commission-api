@@ -11,27 +11,28 @@ from app.api.v1.views.response_vars import (
 OFFICE_BP_V1 = Blueprint("v1_office", __name__, url_prefix="/api/v1")
 
 
-@OFFICE_BP_V1.route("/offices", methods=["POST", "GET"])
-def offices():
-    """ Create a political office(POST) and Fetch all political offices (GET)
-    """
+@OFFICE_BP_V1.route("/offices", methods=["GET"])
+def fetch_all_offices():
+    """ Fetch all political offices (GET) """
+    return jsonify(PoliticalOffices.get_all_offices())
+
+
+@OFFICE_BP_V1.route("/offices", methods=["POST"])
+def create_an_offices():
+    """ Create a political office """
     custom_response = None
-    if request.method == "POST":
-        office_reg_data = request.get_json(force=True)
-        sample_office = PoliticalOffices(office_reg_data)
-        if len(office_reg_data) > 2:
-            custom_response = jsonify(more_data_fields_response), 400
-        elif len(office_reg_data) < 2:
-            custom_response = jsonify(few_data_fields_response), 400
-        elif sample_office.office_reg_validadion() is None:
-            custom_response = jsonify(sample_office.create_office()), 201
-        else:
-            custom_response = sample_office.office_reg_validadion()
+    office_reg_data = request.get_json(force=True)
+    sample_office = PoliticalOffices(office_reg_data)
+    if len(office_reg_data) > 2:
+        custom_response = jsonify(more_data_fields_response), 400
+    elif len(office_reg_data) < 2:
+        custom_response = jsonify(few_data_fields_response), 400
+    elif sample_office.office_reg_validadion() is None:
+        custom_response = jsonify(sample_office.create_office()), 201
     else:
-        custom_response = jsonify(PoliticalOffices.get_all_offices())
+        custom_response = sample_office.office_reg_validadion()
 
     return custom_response
-
 
 @OFFICE_BP_V1.route("/offices/<int:pid>", methods=["GET"])
 def office(pid):
