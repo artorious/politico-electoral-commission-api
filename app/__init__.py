@@ -11,6 +11,13 @@ def page_not_found_error(err):
         "error": "Resource not found on the server."
     }), 404
 
+def method_not_not_allowed(err):
+    """ 405 status custom return message """
+    return jsonify({
+        "status": 405,
+        "error": "Method not allowed on this endpoint."
+    }), 405
+
 def bad_user_request_error(err):
     """ 400 status custom return message """
     return jsonify({
@@ -32,8 +39,8 @@ def create_app(config_mode):
     app.config.from_object(app_config[config_mode])
     app.config.from_pyfile('config.py')
     # local imports
-    from app.api.v1 import party_views
-    from app.api.v1 import office_views
+    from app.api.v1.views import party_views
+    from app.api.v1.views import office_views
     # Register Blueprints
     app.register_blueprint(party_views.PARTY_BP_V1)
     app.register_blueprint(office_views.OFFICE_BP_V1)
@@ -41,6 +48,7 @@ def create_app(config_mode):
     app.register_error_handler(404, page_not_found_error)
     app.register_error_handler(400, bad_user_request_error)
     app.register_error_handler(500, server_side_error)
+    app.register_error_handler(405, method_not_not_allowed)
 
 
     @app.route("/")

@@ -2,14 +2,22 @@
 """ Data representation - Routines for user to interact with the API. """
 
 import time
+from flask import jsonify
+from app.api.v1.validation_script import (
+    more_data_fields_response, few_data_fields_response,
+    unprocessable_data_response, empty_data_field_response,
+    entity_already_exists_response, id_out_of_range_response,
+    id_cannot_be_zero_response, QueryHelper
+)
+
 
 POLITICAL_PARTIES = []
 PARTY_COUNT = 1
 
 
-class PoliticalParties:
+class PoliticalParties(QueryHelper):
     """ Methods to model party information """
-    def __init__(self, party_reg_data):
+    def __init__(self, party_reg_data=None):
         self.party_reg_data = party_reg_data
 
     def create_party(self):
@@ -67,50 +75,26 @@ class PoliticalParties:
             custom_msg = False
         return custom_msg
 
-    @staticmethod
-    def check_whether_party_exists(name):
+
+    def check_whether_party_exists(self, name):
         """ Handle double registartion """
-        party_already_present = False
-        for each_party in POLITICAL_PARTIES:
-            if each_party["name"] == name:
-                party_already_present = True
+        global POLITICAL_PARTIES
+        return super().check_whether_entity_exists(name, POLITICAL_PARTIES)
 
-        return party_already_present
-
-    @staticmethod
-    def get_all_parties():
+    def get_all_parties(self):
         """ Fetch all parties """
         global POLITICAL_PARTIES
-        custom_msg = None
+        return super().fetch_all_entities(POLITICAL_PARTIES)
 
-        if POLITICAL_PARTIES == []:
-            custom_msg = {
-                "status": 200,
-                "data": "The Party list is empty"
-            }
-
-        else:
-            custom_msg = {
-                "status": 200,
-                "data": POLITICAL_PARTIES
-            }
-        return custom_msg
-
-    @staticmethod
-    def check_id_exists(pid):
+    def check_id_exists(self, pid):
         """ Check that provided id """
         global POLITICAL_PARTIES
+        return super().lookup_if_entity_id_exists(pid, POLITICAL_PARTIES)
 
-        if pid in [party["id"] for party in POLITICAL_PARTIES]:
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def fetch_a_party(pid):
+    def fetch_a_party(self, pid):
         """ Fetch a political party by ID"""
         global POLITICAL_PARTIES
-        return [party for party in POLITICAL_PARTIES if party['id'] == pid]
+        return super().fetch_an_entity_by_id(pid, POLITICAL_PARTIES)
 
     @staticmethod
     def check_for_valid_party_name(name):
@@ -140,3 +124,14 @@ class PoliticalParties:
             {"message": f"Party No. {pid} deleted succesfully"}
             ]
         }
+
+    def party_reg_validation(self):
+        custom_response = None
+        if self.check_for_expected_value_types() is False:
+            custom_response = jsonify(unprocessable_data_response), 422
+        elif self.check_for_any_empty_fields() is False:
+            custom_response = jsonify(empty_data_field_response), 422
+        elif self.check_whether_party_exists(
+            self.party_reg_data["name"]) is True:
+            custom_response = jsonify(entity_already_exists_response), 409
+        return custom_response

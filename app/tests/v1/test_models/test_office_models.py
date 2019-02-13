@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ Tests for Office related models"""
 import unittest
-from app.api.v1.office_models import PoliticalOffices
+from app.api.v1.models.office_models import PoliticalOffices
 
 
 class TestPolticalOffices(unittest.TestCase):

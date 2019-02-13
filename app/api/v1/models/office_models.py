@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 """ Models Office Information """
 import time
+from flask import jsonify
+from app.api.v1.validation_script import (
+    more_data_fields_response, few_data_fields_response,
+    unprocessable_data_response, empty_data_field_response,
+    entity_already_exists_response, id_out_of_range_response,
+    id_cannot_be_zero_response, QueryHelper
+)
 
 POLITICAL_OFFICES = []
 OFFICE_COUNT = 1
 
 
-class PoliticalOffices:
+class PoliticalOffices(QueryHelper):
     """ Methods to handle office related data"""
-    def __init__(self, office_reg_data):
+    def __init__(self, office_reg_data=None):
         self.office_reg_data = office_reg_data
 
     def create_office(self):
@@ -67,47 +74,35 @@ class PoliticalOffices:
             custom_msg = False
         return custom_msg
 
-    @staticmethod
-    def check_whether_office_exists(office_name):
+    def check_whether_office_exists(self, name):
         """ Returns True if the office exists, else False"""
-        office_already_present = False
-        for each_office in POLITICAL_OFFICES:
-            if each_office["name"] == office_name:
-                office_already_present = True
+        global POLITICAL_OFFICES
+        return super().check_whether_entity_exists(name, POLITICAL_OFFICES)
 
-        return office_already_present
-
-    @staticmethod
-    def get_all_offices():
+    def get_all_offices(self):
         """ Fetch all parties """
         global POLITICAL_OFFICES
-        custom_msg = None
+        return super().fetch_all_entities(POLITICAL_OFFICES)
 
-        if POLITICAL_OFFICES == []:
-            custom_msg = {
-                "status": 200,
-                "data": "The Office list is empty"
-            }
-
-        else:
-            custom_msg = {
-                "status": 200,
-                "data": POLITICAL_OFFICES
-            }
-        return custom_msg
-
-    @staticmethod
-    def check_id_exists(pid):
+    def check_id_exists(self, pid):
         """ Check that provided id """
         global POLITICAL_OFFICES
+        return super().lookup_if_entity_id_exists(pid, POLITICAL_OFFICES)
 
-        if pid in [office["id"] for office in POLITICAL_OFFICES]:
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def fetch_an_office(pid):
+    def fetch_an_office(self, pid):
         """ Fetch a political office by ID"""
         global POLITICAL_OFFICES
-        return [office for office in POLITICAL_OFFICES if office['id'] == pid]
+        return super().fetch_an_entity_by_id(pid, POLITICAL_OFFICES)
+
+    def office_reg_validation(self):
+        custom_response = None
+        if self.check_for_only_expected_value_types() is False:
+            custom_response = jsonify(unprocessable_data_response), 422
+        elif self.check_any_for_empty_fields() is False:
+            custom_response = jsonify(empty_data_field_response), 422
+        elif self.check_whether_office_exists(
+            self.office_reg_data["name"]) is True:
+            custom_response = jsonify(entity_already_exists_response), 409
+        return custom_response
+
+
