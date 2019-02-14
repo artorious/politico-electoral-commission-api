@@ -68,7 +68,6 @@ def fetch_a_party(pid):
 
     return custom_response
 
-
 @PARTY_BP_V2.route("/parties/<int:pid>", methods=["DELETE"])
 def delete_a_party(pid):
     """DELETE a political party  by ID """
@@ -90,4 +89,23 @@ def delete_a_party(pid):
 @PARTY_BP_V2.route("/parties/<int:pid>/name", methods=["PATCH"])
 def party_editor(pid):
     """ Edit politcal party  name by ID"""
-    pass
+    """ Edit politcal party  name by ID"""
+    custom_response = None
+    party_updates = request.get_json(force=True)
+
+    if len(party_updates) != 1:
+        custom_response = jsonify(ValidationHelper.more_data_fields_response), 400
+    elif pid < 1:
+        custom_response = jsonify(ValidationHelper.id_cannot_be_zero_response), 400
+    elif ValidationHelper().check_for_expected_value_types_in_user_input(party_updates, "party update") is False:
+        custom_response = jsonify(ValidationHelper.unprocessable_data_response), 422
+    elif ValidationHelper().check_for_empty_strings_in_user_input(party_updates, "party update") is False:
+        custom_response = jsonify(ValidationHelper.empty_data_field_response), 422
+    elif DatabaseManager().lookup_whether_entity_exists_in_a_table_by_attrib("parties", "pid", pid) is False:
+        custom_response = jsonify(ValidationHelper.id_out_of_range_response), 416
+    else:
+        custom_response = jsonify({
+            "status": 200,
+            "data": [DatabaseManager().edit_a_table_record("parties", pid, party_updates)]
+            }), 200
+    return custom_response

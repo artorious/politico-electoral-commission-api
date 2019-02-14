@@ -83,7 +83,16 @@ class DatabaseManager:
 
 
     def edit_a_table_record(self, table, entity_id, new_data):
-        pass
+        custom_msg = None
+        try:
+            self.cursor.execute(f"update {table} set name = '{new_data['name']}' where pid={entity_id} returning pid, name;")
+            response = self.cursor.fetchall()
+            custom_msg = {"Party Id": response[0]["pid"], "New Party Name": response[0]["name"]}
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+        finally:
+            return custom_msg
+
 
     def delete_a_table_record(self, table, entity_id):
         custom_msg = None

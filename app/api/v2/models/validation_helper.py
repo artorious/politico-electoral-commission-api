@@ -50,6 +50,11 @@ class ValidationHelper(DatabaseManager):
                 custom_msg = False
             else:
                 custom_msg = True
+        elif cartegory  == "party update":
+            if raw_data["name"].strip() == "" or raw_data["name"].isspace():
+                custom_msg = False
+            else:
+                custom_msg = True
 
         return custom_msg
 
@@ -59,7 +64,8 @@ class ValidationHelper(DatabaseManager):
         item_values = list(raw_data.values())
         if cartegory == "party registration":
             custom_msg = all(isinstance(item, str) for item in item_values)
-            
+        elif cartegory  == "party update":
+            custom_msg = isinstance(raw_data["name"], str)
         return custom_msg
 
     def check_for_expected_no_of_fields(self, raw_data, cartegory):
