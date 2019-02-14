@@ -10,13 +10,15 @@ class TestPartiesRoutes(unittest.TestCase):
 
     def setUp(self):
         """ Init app and test vars """
+        
         self.app = create_app(config_mode="testing")
-        self.client = self.app.test_client
-        self.party_reg_data = {
-            "name": "Jubilee",
-            "hq_address": "Jubilee Tower, Pangani, Thika Road",
-            "logo_url": "/static/jubilee.jpeg"
-        }
+        with self.app.app_context():
+            self.client = self.app.test_client
+            self.party_reg_data = {
+                "name": "Jubilee",
+                "hq_address": "Jubilee Tower, Pangani, Thika Road",
+                "logo_url": "/static/jubilee.jpeg"
+            }
 
     def tearDown(self):
         with self.app.app_context():
@@ -166,3 +168,24 @@ class TestPartyCreation(TestPartiesRoutes):
             "Conflict - Entity already exists",
             msg="Response Body Contents- Should be custom message "
         )
+
+
+
+
+class TestFetchingParty(TestPartiesRoutes):
+    """ Test for feching political parties """
+    def test_fetching_of_created_parties(self):
+        """ Test succesful fetch of all messages """
+        response = self.client().post(
+            "/api/v2/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+        response = self.client().get("/api/v2/parties")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Political Parties", str(response.data))
+        self.assertIn("status", str(response.data))

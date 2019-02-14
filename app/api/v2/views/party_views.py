@@ -2,12 +2,32 @@
 """ Political party views """
 from flask import Blueprint, jsonify, request
 from app.api.v2.models.party_models import PoliticalParties
+from app.api.v2.models.database_models import DatabaseManager
+
+
 PARTY_BP_V2 = Blueprint("v2_party", __name__, url_prefix="/api/v2")
 
+
+# db =  DatabaseManager()
 @PARTY_BP_V2.route("/parties", methods=["GET"])
 def fetch_all_parties():
     """ Fetch all political parties """
-    pass
+    raw_parties = DatabaseManager().fetch_all_records_in_a_table("parties")
+    
+    if raw_parties == []:
+        custom_response = jsonify({"data": "The Party list is empty", "status": 200}), 200
+    else:
+        data = []
+        for record in raw_parties:
+            sample = {}
+            sample["Party ID"] = record["pid"]
+            sample["Party Name"] = record["name"]
+            sample["HQ Address"] = record["hq_address"]
+            sample["Logo URL"] = record["logo_url"]
+            sample["Registration Timestamp"] = record["registration_timestamp"]
+            data.append(sample)
+        custom_response = jsonify({"status": 200, "Political Parties": data}), 200
+    return custom_response
 
 
 @PARTY_BP_V2.route("/parties", methods=["POST"])

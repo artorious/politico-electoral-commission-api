@@ -46,8 +46,15 @@ class DatabaseManager:
     def insert_a_validated_record_into_table(self, table, user_data):
         pass
 
-    def fetch_all_records_in_a_table(self):
-        pass
+    def fetch_all_records_in_a_table(self, table):
+        custom_msg = None
+        try:
+            self.cursor.execute(f"select * from {table};")
+            custom_msg = self.cursor.fetchall()
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+        finally:
+            return custom_msg
 
     def fetch_a_record_by_id_from_a_table(self, entity_id):
         pass
@@ -96,3 +103,8 @@ class DatabaseManager:
             self.conn.rollback()
             print('An Error Occured: {}'.format(error))
             sys.exit(1)
+    
+    def close_database(self):
+        """ Closes database connection """
+        if self.conn:
+            self.conn.close()
