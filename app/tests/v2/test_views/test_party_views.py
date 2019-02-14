@@ -263,3 +263,64 @@ class TestFetchingParty(TestPartiesRoutes):
             "Resource not found on the server.",
             msg="Response Body Contents- Should be custom message "
         )
+
+class TestDeleteParty(TestPartiesRoutes):
+    """ Test cases for deleting a party """
+
+    def test_deleting_party_with_a_negative_id(self):
+        """ Test deleting with a negative ID"""
+        response = self.client().delete("/api/v2/parties/-1")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404, msg="Should be 404 - (Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_deleting_party_with_an_out_of_bound_id(self):
+        """ Test with a integer that is out of bound (416 - Out of range)"""
+
+        response = self.client().delete("/api/v2/parties/1000")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 416, msg="Should be 416 - Out of range"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Entity not in server. ID out of range.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_with_non_int_as_id(self):
+        """ Try to delete with an ID that isnt an int """
+        response = self.client().delete("/api/v2/parties/one")
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not Found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_test_with_float_as_id(self):
+        """ Test Deleting with a floating point ID"""
+        response = self.client().delete("/api/v2/parties/1.0")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )

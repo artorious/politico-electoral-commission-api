@@ -72,10 +72,22 @@ def fetch_a_party(pid):
 @PARTY_BP_V2.route("/parties/<int:pid>", methods=["DELETE"])
 def delete_a_party(pid):
     """DELETE a political party  by ID """
-    pass
+    custom_response = None
+    if pid >= 1:
+        if DatabaseManager().lookup_whether_entity_exists_in_a_table_by_attrib("parties", "pid", pid) is True:
+            custom_response = jsonify({
+                "status": 200,
+                "message": DatabaseManager().delete_a_table_record("parties", pid)
+            }), 200
+        else:
+            custom_response = jsonify(ValidationHelper().id_out_of_range_response), 416
+    else:
+        custom_response = jsonify(ValidationHelper().id_cannot_be_zero_response), 400
+
+    return custom_response
 
 
 @PARTY_BP_V2.route("/parties/<int:pid>/name", methods=["PATCH"])
-def party_manager(pid):
+def party_editor(pid):
     """ Edit politcal party  name by ID"""
     pass

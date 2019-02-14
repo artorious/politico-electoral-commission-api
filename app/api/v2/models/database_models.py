@@ -86,7 +86,14 @@ class DatabaseManager:
         pass
 
     def delete_a_table_record(self, table, entity_id):
-        pass
+        custom_msg = None
+        try:
+            self.cursor.execute(f"delete from {table} where pid={entity_id};")
+            custom_msg = f"Party No. {entity_id} deleted succesfully"
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+        finally:
+            return custom_msg
 
     def tally_an_entity(self, table, count_item):
         pass
