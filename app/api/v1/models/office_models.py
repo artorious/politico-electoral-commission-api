@@ -28,7 +28,7 @@ class PoliticalOffices(QueryHelper):
         POLITICAL_OFFICES.append(self.office_reg_data)
         custom_msg = {
             "status": 201,
-            "data": [{
+            "office": [{
                 "id": self.office_reg_data["id"],
                 "name": self.office_reg_data["name"],
                 "type": self.office_reg_data["type"],

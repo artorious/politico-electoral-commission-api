@@ -49,7 +49,7 @@ def office(oid):
             }), 200
         else:
             custom_response = jsonify(id_out_of_range_response), 416
-    elif pid < 1:
+    elif oid < 1:
         custom_response = jsonify(id_cannot_be_zero_response), 400
 
     return custom_response

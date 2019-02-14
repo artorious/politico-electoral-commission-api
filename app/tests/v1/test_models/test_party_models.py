@@ -70,7 +70,7 @@ class TestPolticalParties(unittest.TestCase):
     def test_create_party_method_returns_a_custom_message(self):
         """ Test a political prty is created"""
         self.assertDictEqual(
-            {'status': 201, 'data': [{'id': 1, 'name': 'Jubilee'}]},
+            {'status': 201, 'party': [{'id': 1, 'name': 'Jubilee'}]},
             self.test_data.create_party()
         )
 
