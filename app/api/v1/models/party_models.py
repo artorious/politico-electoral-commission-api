@@ -30,7 +30,7 @@ class PoliticalParties(QueryHelper):
         POLITICAL_PARTIES.append(self.party_reg_data)
         custom_msg = {
             "status": 201,
-            "data": [{
+            "party": [{
                 "id": self.party_reg_data["id"],
                 "name": self.party_reg_data["name"]
                 }]

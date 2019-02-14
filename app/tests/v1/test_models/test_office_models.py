@@ -84,7 +84,7 @@ class TestPolticalOffices(unittest.TestCase):
     def test_create_office_method_returns_a_custom_message(self):
         """ Test that a political office is created"""
         self.assertDictEqual(
-            {"status": 201, "data": [
+            {"status": 201, "office": [
                 {"id": 1, "name": "President of the Republic",
                  "type": "Federal"}
             ]},
