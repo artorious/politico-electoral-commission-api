@@ -2,6 +2,7 @@
 """ Methods for querying the database """
 import sys
 import psycopg2
+import psycopg2.extras
 from flask import current_app
 
 class DatabaseManager:
@@ -27,7 +28,8 @@ class DatabaseManager:
         try:
             self.conn = psycopg2.connect(current_app.config['DATABASE_URI'])
             self.conn.autocommit = True
-            self.cursor = self.conn.cursor()
+            self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            #self.cursor = self.conn.cursor()
         except psycopg2.DatabaseError as err:
             print(f"Error connecting to DB: {err}")
 
@@ -50,8 +52,22 @@ class DatabaseManager:
     def fetch_a_record_by_id_from_a_table(self, entity_id):
         pass
 
-    def lookup_whether_entity_exists_in_a_table_by_attrib(self, attrib, table):
-        pass
+    def lookup_whether_entity_exists_in_a_table_by_attrib(self, table, attrib, value):
+        """ Checks for <value> in <table> on colunm <atrrib>  in DB, 
+            returns True if it exists, else False
+        """
+        try:
+            query =  f"SELECT * from {table} WHERE {attrib} LIKE '{value}';"
+            self.cursor.execute(query)
+            entity_fetch = self.cursor.fetchone()
+            if entity_fetch == None:
+                msg_out = False
+            else:
+                msg_out = True
+            return msg_out
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+
 
     def edit_a_table_record(self, table, entity_id, new_data):
         pass
