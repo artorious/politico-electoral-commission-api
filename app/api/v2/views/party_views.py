@@ -3,7 +3,7 @@
 from flask import Blueprint, jsonify, request
 from app.api.v2.models.party_models import PoliticalParties
 from app.api.v2.models.database_models import DatabaseManager
-
+from app.api.v2.models.validation_helper import ValidationHelper
 
 PARTY_BP_V2 = Blueprint("v2_party", __name__, url_prefix="/api/v2")
 
@@ -50,7 +50,23 @@ def create_a_party():
 @PARTY_BP_V2.route("/parties/<int:pid>", methods=["GET"])
 def fetch_a_party(pid):
     """(Fetch a political party  by ID """
-    pass
+    custom_response = None
+    if pid >= 1:
+        if DatabaseManager().lookup_whether_entity_exists_in_a_table_by_attrib("parties", "pid", pid) is True:
+            raw_party = DatabaseManager().fetch_a_record_by_id_from_a_table("parties", pid)
+            party = {}
+            party["Party ID"] = raw_party[0]["pid"]
+            party["Party Name"] = raw_party[0]["name"]
+            party["HQ Address"] = raw_party[0]["hq_address"]
+            party["Logo URL"] = raw_party[0]["logo_url"]
+            party["Registration Timestamp"] = raw_party[0]["registration_timestamp"]
+            custom_response = jsonify({"status": 200, "Political Party": [party]})
+        else:
+            custom_response = jsonify(ValidationHelper().id_out_of_range_response), 416
+    else:
+        custom_response = jsonify(ValidationHelper().id_cannot_be_zero_response), 400
+
+    return custom_response
 
 
 @PARTY_BP_V2.route("/parties/<int:pid>", methods=["DELETE"])

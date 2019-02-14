@@ -56,16 +56,22 @@ class DatabaseManager:
         finally:
             return custom_msg
 
-    def fetch_a_record_by_id_from_a_table(self, entity_id):
-        pass
+    def fetch_a_record_by_id_from_a_table(self, table, entity_id):
+        custom_msg = None
+        try:
+            self.cursor.execute(f"select * from {table} where pid={entity_id};")
+            custom_msg = self.cursor.fetchall()
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+        finally:
+            return custom_msg
 
     def lookup_whether_entity_exists_in_a_table_by_attrib(self, table, attrib, value):
         """ Checks for <value> in <table> on colunm <atrrib>  in DB, 
             returns True if it exists, else False
         """
         try:
-            query =  f"SELECT * from {table} WHERE {attrib} LIKE '{value}';"
-            self.cursor.execute(query)
+            self.cursor.execute(f"SELECT * from {table} WHERE {attrib}='{value}';")
             entity_fetch = self.cursor.fetchone()
             if entity_fetch == None:
                 msg_out = False

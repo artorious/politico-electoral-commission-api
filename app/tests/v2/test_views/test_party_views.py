@@ -189,3 +189,77 @@ class TestFetchingParty(TestPartiesRoutes):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Political Parties", str(response.data))
         self.assertIn("status", str(response.data))
+
+    def test_fetching_a_party_with_a_negative_id_value(self):
+        """ Test with a negative integer """
+        response = self.client().get("/api/v1/parties/-1")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404, msg="Should be 404 - (Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_fetching_a_party_with_a_valid_id_that_is_out_of_bound(self):
+        """ Test with a integer that is out of bound (416 - Out of range)"""
+
+        response = self.client().get("/api/v2/parties/1000")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 416, msg="Should be 416 - Out of range"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Entity not in server. ID out of range.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_fetching_a_party_with_a_floating_point_value_for_id(self):
+        """ Test with a floating point number """
+        response = self.client().get("/api/v2/parties/1.0")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_fetching_a_party_with_a_non_numeric_value_for_id(self):
+        """ Test fetching with a non-numeric character 404 Not found """
+        response = self.client().get("/api/v2/parties/one")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 404-(Not Found)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+    def test_fetching_a_party_without_providing_a_value_blank_field(self):
+        """ 400 - Bad query"""
+        response = self.client().get("/api/v2/parties/")
+        deserialized_response = json.loads(response.data.decode())
+
+        self.assertEqual(
+            response.status_code, 404,
+            msg="Should be 400-(Bad Query)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Resource not found on the server.",
+            msg="Response Body Contents- Should be custom message "
+        )
