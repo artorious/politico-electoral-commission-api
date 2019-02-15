@@ -56,10 +56,10 @@ class DatabaseManager:
         finally:
             return custom_msg
 
-    def fetch_a_record_by_id_from_a_table(self, table, entity_id):
+    def fetch_a_record_by_id_from_a_table(self, table, entity_id, id_value):
         custom_msg = None
         try:
-            self.cursor.execute(f"select * from {table} where pid={entity_id};")
+            self.cursor.execute(f"select * from {table} where {entity_id}={id_value};")
             custom_msg = self.cursor.fetchall()
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)

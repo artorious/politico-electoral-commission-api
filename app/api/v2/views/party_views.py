@@ -52,7 +52,7 @@ def fetch_a_party(pid):
     custom_response = None
     if pid >= 1:
         if DatabaseManager().lookup_whether_entity_exists_in_a_table_by_attrib("parties", "pid", pid) is True:
-            raw_party = DatabaseManager().fetch_a_record_by_id_from_a_table("parties", pid)
+            raw_party = DatabaseManager().fetch_a_record_by_id_from_a_table("parties", "pid", pid)
             party = {}
             party["Party ID"] = raw_party[0]["pid"]
             party["Party Name"] = raw_party[0]["name"]
