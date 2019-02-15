@@ -8,7 +8,6 @@ from app.api.v2.models.validation_helper import ValidationHelper
 PARTY_BP_V2 = Blueprint("v2_party", __name__, url_prefix="/api/v2")
 
 
-# db =  DatabaseManager()
 @PARTY_BP_V2.route("/parties", methods=["GET"])
 def fetch_all_parties():
     """ Fetch all political parties """
@@ -88,7 +87,6 @@ def delete_a_party(pid):
 
 @PARTY_BP_V2.route("/parties/<int:pid>/name", methods=["PATCH"])
 def party_editor(pid):
-    """ Edit politcal party  name by ID"""
     """ Edit politcal party  name by ID"""
     custom_response = None
     party_updates = request.get_json(force=True)

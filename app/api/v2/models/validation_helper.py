@@ -31,11 +31,13 @@ class ValidationHelper(DatabaseManager):
     }
 
     def check_for_expected_keys_in_user_input(self, raw_data, cartegory):
+        custom_msg = None
         if cartegory == "party registration":
-            return list(raw_data.keys()) == self.expected_party_fields
-        else:
-            pass
-
+            custom_msg = list(raw_data.keys()) == self.expected_party_fields
+        elif cartegory == "office registration":
+            custom_msg = list(raw_data.keys()) == ["name", "type"]
+        return custom_msg
+    
     def check_for_empty_strings_in_user_input(self, raw_data, cartegory):
         """ Truthy """
         custom_msg = None
@@ -55,6 +57,16 @@ class ValidationHelper(DatabaseManager):
                 custom_msg = False
             else:
                 custom_msg = True
+        elif cartegory == "office registration":
+            if "" in raw_data.values():
+                custom_msg = False
+            elif (
+                raw_data["name"].isspace() or
+                raw_data["type"].isspace() 
+            ):
+                custom_msg = False
+            else:
+                custom_msg = True            
 
         return custom_msg
 
@@ -62,7 +74,7 @@ class ValidationHelper(DatabaseManager):
         """ Check for expected value types"""
         custom_msg = None
         item_values = list(raw_data.values())
-        if cartegory == "party registration":
+        if cartegory == "party registration" or "office registration":
             custom_msg = all(isinstance(item, str) for item in item_values)
         elif cartegory  == "party update":
             custom_msg = isinstance(raw_data["name"], str)
