@@ -15,7 +15,7 @@ before_script:
     - psql -c 'create database politico_db;' -U postgres
 
 script:
-    - coverage run --source app/tests/v2/ -m pytest
+    - coverage run --source app/tests/ -m pytest
 
 after_success:
     - coveralls
