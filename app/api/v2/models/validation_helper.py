@@ -2,7 +2,9 @@
 """ Methods to validate data """
 from app.api.v2.models.database_models import DatabaseManager
 
+
 class ValidationHelper(DatabaseManager):
+    """ Methods that Validate user input"""
     def __init__(self):
         super().__init__()
     """ Validation methods """
@@ -24,7 +26,8 @@ class ValidationHelper(DatabaseManager):
         "status": 416, "error": "Entity not in server. ID out of range."
     }
     unprocessable_data_response = {
-        "status": 422, "error": "Unprocessable Entity - Invalid value in data field"
+        "status": 422,
+        "error": "Unprocessable Entity - Invalid value in data field"
     }
     empty_data_field_response = {
         "status": 422, "error": "Empty data field"
@@ -37,7 +40,7 @@ class ValidationHelper(DatabaseManager):
         elif cartegory == "office registration":
             custom_msg = list(raw_data.keys()) == ["name", "type"]
         return custom_msg
-    
+
     def check_for_empty_strings_in_user_input(self, raw_data, cartegory):
         """ Truthy """
         custom_msg = None
@@ -62,11 +65,11 @@ class ValidationHelper(DatabaseManager):
                 custom_msg = False
             elif (
                 raw_data["name"].isspace() or
-                raw_data["type"].isspace() 
+                raw_data["type"].isspace()
             ):
                 custom_msg = False
             else:
-                custom_msg = True            
+                custom_msg = True
 
         return custom_msg
 
@@ -76,7 +79,7 @@ class ValidationHelper(DatabaseManager):
         item_values = list(raw_data.values())
         if cartegory == "party registration" or "office registration":
             custom_msg = all(isinstance(item, str) for item in item_values)
-        elif cartegory  == "party update":
+        elif cartegory == "party update":
             custom_msg = isinstance(raw_data["name"], str)
         return custom_msg
 
