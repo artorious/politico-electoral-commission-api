@@ -12,17 +12,17 @@ A web application platform which both the politicians and citizens can use. Poli
 
 **Endpoint** | **Request**| **Description**
 --- | --- | ---
-`/api/v1/parties` | `POST` | Create a political party
-`/api/v1/parties` | `GET`| Fetch all political parties
-`/api/v1/parties/<int:id>` | `GET` |   Fetch a specific political party
-`/api/v1/parties/<int:id>` | `DELETE` |   Delete a specific political party
-`/api/v1/<int:id>/name` | `PATCH` | Edit a political party
+`/api/v2/parties` | `POST` | Create a political party
+`/api/v2/parties` | `GET`| Fetch all political parties
+`/api/v2/parties/<int:id>` | `GET` |   Fetch a specific political party
+`/api/v2/parties/<int:id>` | `DELETE` |   Delete a specific political party
+`/api/v2/<int:id>/name` | `PATCH` | Edit a political party
 `/app/api/v1/offices` | `POST`| Create Political office
-`/api/v1/offices` | `GET` | Fetch all political offices
-`/api/v1/offices/<int:id>` | `GET` | Fetch a specific offices
+`/api/v2/offices` | `GET` | Fetch all political offices
+`/api/v2/offices/<int:id>` | `GET` | Fetch a specific offices
 
 ## Usage
-* Read and interact with the [API Documentation](https://documenter.getpostman.com/view/3796196/RztoKnTh)
+* Read and interact with the [API Documentation](https://documenter.getpostman.com/view/3796196/RztspSTt)
 ### Testing
 * On Postaman App:
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/016419570361ff8cce12)
