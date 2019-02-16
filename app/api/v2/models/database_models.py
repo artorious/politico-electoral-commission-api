@@ -12,16 +12,32 @@ class DatabaseManager:
             pid SERIAL PRIMARY KEY, \
             name VARCHAR(50) UNIQUE NOT NULL,\
             hq_address VARCHAR(50) UNIQUE NOT NULL, \
-            logo_url VARCHAR(50) UNIQUE NOT NULL, \
+            logo_url TEXT UNIQUE NOT NULL, \
             registration_timestamp VARCHAR(50) NOT NULL \
             );"
 
     offices_table_query = "CREATE TABLE IF NOT EXISTS offices (\
             oid SERIAL PRIMARY KEY, \
             name VARCHAR(50) UNIQUE NOT NULL,\
-            type VARCHAR(25) NOT NULL CHECK (type IN \
+            type VARCHAR(50) NOT NULL CHECK (type IN \
             ('Federal', 'Legislative', 'State', 'Local Government')), \
             registration_timestamp VARCHAR(50) NOT NULL \
+            );"
+
+    users_table_query = "CREATE TABLE IF NOT EXISTS users (\
+            uid SERIAL PRIMARY KEY, \
+            firstname VARCHAR(50) NOT NULL, \
+            lastname VARCHAR(50) NOT NULL, \
+            othername VARCHAR(50) NOT NULL, \
+            authtoken TEXT UNIQUE NOT NULL, \
+            email VARCHAR(50) UNIQUE NOT NULL, \
+            telephone VARCHAR(50) UNIQUE NOT NULL, \
+            passport_url TEXT UNIQUE NOT NULL, \
+            login_status BOOLEAN NOT NULL, \
+            registration_timestamp VARCHAR(50) NOT NULL, \
+            last_login_timestamp VARCHAR(50) NOT NULL, \
+            is_admin BOOLEAN NOT NULL, \
+            password VARCHAR NOT NULL \
             );"
 
     def __init__(self):
@@ -41,6 +57,7 @@ class DatabaseManager:
         """ Create all Tables """
         self.cursor.execute(self.parties_table_query)
         self.cursor.execute(self.offices_table_query)
+        self.cursor.execute(self.users_table_query)
         print("Tables Created Succesfully")
 
     def fetch_all_records_in_a_table(self, table):
