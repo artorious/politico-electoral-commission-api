@@ -22,8 +22,17 @@ class ValidationHelper(DatabaseManager):
     entity_already_exists_response = {
         "status": 409, "error": "Conflict - Entity already exists"
     }
+    party_already_exists_response = {
+        "status": 409, "error": "Conflict - Party already exists"
+    }
+    logo_already_exists_response = {
+        "status": 409, "error": "Conflict - Logo already in use"
+    }
+    hq_already_exists_response = {
+        "status": 409, "error": "Conflict - Address already in use"
+    }
     id_out_of_range_response = {
-        "status": 416, "error": "Entity not in server. ID out of range."
+        "status": 404, "error": "Entity not in server. ID out of range."
     }
     unprocessable_data_response = {
         "status": 422,
@@ -33,13 +42,14 @@ class ValidationHelper(DatabaseManager):
         "status": 422, "error": "Empty data field"
     }
 
-    def check_for_expected_keys_in_user_input(self, raw_data, cartegory):
-        custom_msg = None
-        if cartegory == "party registration":
-            custom_msg = list(raw_data.keys()) == self.expected_party_fields
-        elif cartegory == "office registration":
-            custom_msg = list(raw_data.keys()) == ["name", "type"]
-        return custom_msg
+    def check_for_expected_keys_in_user_input(
+        self, raw_data, expected_party_fields
+    ):
+        """ (dict, list) -> bool
+            Check for expected dict keys in user_input.
+            Return True/False
+        """
+        return list(raw_data.keys()) == expected_party_fields
 
     def check_for_empty_strings_in_user_input(self, raw_data, cartegory):
         """ Truthy """
@@ -47,6 +57,7 @@ class ValidationHelper(DatabaseManager):
         if cartegory == "party registration":
             if "" in raw_data.values():
                 custom_msg = False
+
             elif (
                 raw_data["name"].isspace() or
                 raw_data["hq_address"].isspace() or
@@ -55,7 +66,7 @@ class ValidationHelper(DatabaseManager):
                 custom_msg = False
             else:
                 custom_msg = True
-        elif cartegory  == "party update":
+        elif cartegory == "party update":
             if raw_data["name"].strip() == "" or raw_data["name"].isspace():
                 custom_msg = False
             else:
@@ -73,15 +84,13 @@ class ValidationHelper(DatabaseManager):
 
         return custom_msg
 
-    def check_for_expected_value_types_in_user_input(self, raw_data, cartegory):
-        """ Check for expected value types"""
-        custom_msg = None
-        item_values = list(raw_data.values())
-        if cartegory == "party registration" or "office registration":
-            custom_msg = all(isinstance(item, str) for item in item_values)
-        elif cartegory == "party update":
-            custom_msg = isinstance(raw_data["name"], str)
-        return custom_msg
+    def check_for_expected_value_types_in_user_input(self, raw_data):
+        """ (dict) -> bool
+            Check for expected value types
+            eturn True/False
+        """
+        values_list = list(raw_data.values())
+        return all(isinstance(item, str) for item in values_list)
 
     def check_for_expected_no_of_fields(self, raw_data, cartegory):
         pass

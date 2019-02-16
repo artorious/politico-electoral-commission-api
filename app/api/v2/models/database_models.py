@@ -11,8 +11,8 @@ class DatabaseManager:
     parties_table_query = "CREATE TABLE IF NOT EXISTS parties (\
             pid SERIAL PRIMARY KEY, \
             name VARCHAR(50) UNIQUE NOT NULL,\
-            hq_address VARCHAR(50) NOT NULL, \
-            logo_url VARCHAR(50) NOT NULL, \
+            hq_address VARCHAR(50) UNIQUE NOT NULL, \
+            logo_url VARCHAR(50) UNIQUE NOT NULL, \
             registration_timestamp VARCHAR(50) NOT NULL \
             );"
 
@@ -89,6 +89,8 @@ class DatabaseManager:
     def edit_a_table_record(self, table, entity_id, new_data):
         """ Edit/update a record """
         custom_msg = None
+
+        # for item in
         try:
             self.cursor.execute(
                 f"update {table} set name = '{new_data['name']}' " +

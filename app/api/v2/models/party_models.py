@@ -44,15 +44,23 @@ class PoliticalParties(ValidationHelper):
         custom_response = None
         cartegory = "party registration"
         if self.check_for_expected_keys_in_user_input(
-                self.party_reg_data, cartegory) is False:
+                self.party_reg_data, ["name", "hq_address", "logo_url"]
+        ) is False:
             custom_response = jsonify(self.unprocessable_data_response), 422
         elif self.check_for_expected_value_types_in_user_input(
-                self.party_reg_data, cartegory) is False:
+                self.party_reg_data) is False:
             custom_response = jsonify(self.unprocessable_data_response), 422
         elif self.check_for_empty_strings_in_user_input(
                 self.party_reg_data, "party registration") is False:
             custom_response = jsonify(self.empty_data_field_response), 422
         elif self.lookup_whether_entity_exists_in_a_table_by_attrib(
                 "parties", "name", self.party_reg_data["name"]) is True:
-            custom_response = jsonify(self.entity_already_exists_response), 409
+            custom_response = jsonify(self.party_already_exists_response), 409
+        elif self.lookup_whether_entity_exists_in_a_table_by_attrib(
+                "parties", "hq_address", self.party_reg_data["hq_address"]
+        ) is True:
+            custom_response = jsonify(self.hq_already_exists_response), 409
+        elif self.lookup_whether_entity_exists_in_a_table_by_attrib(
+                "parties", "logo_url", self.party_reg_data["logo_url"]) is True:
+            custom_response = jsonify(self.logo_already_exists_response), 409
         return custom_response

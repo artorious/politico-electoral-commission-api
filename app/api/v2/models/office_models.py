@@ -28,7 +28,8 @@ class PoliticalOffices(ValidationHelper):
 
             custom_msg = {"status": 201, "office": [{
                 "id": last_id[0]["oid"],
-                "name": self.office_reg_data["name"]
+                "name": self.office_reg_data["name"],
+                "type": self.office_reg_data["type"]
             }]}
 
         except psycopg2.DatabaseError as err:
@@ -42,12 +43,11 @@ class PoliticalOffices(ValidationHelper):
         custom_response = None
         cartegory = "office registration"
         if self.check_for_expected_keys_in_user_input(
-                self.office_reg_data, cartegory
+                self.office_reg_data, ["name", "type"]
         ) is False:
             custom_response = jsonify(self.unprocessable_data_response), 422
         elif self.check_for_expected_value_types_in_user_input(
-                self.office_reg_data, cartegory
-        ) is False:
+                self.office_reg_data) is False:
             custom_response = jsonify(self.unprocessable_data_response), 422
         elif self.check_for_empty_strings_in_user_input(
                 self.office_reg_data, "office registration"

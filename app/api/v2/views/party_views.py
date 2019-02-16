@@ -71,7 +71,7 @@ def fetch_a_party(pid):
                 "status": 200, "Political Party": [party]})
         else:
             custom_response = jsonify(
-                ValidationHelper().id_out_of_range_response), 416
+                ValidationHelper().id_out_of_range_response), 404
     else:
         custom_response = jsonify(
             ValidationHelper().id_cannot_be_zero_response), 400
@@ -93,7 +93,7 @@ def delete_a_party(pid):
             }), 200
         else:
             custom_response = jsonify(
-                ValidationHelper().id_out_of_range_response), 416
+                ValidationHelper().id_out_of_range_response), 404
     else:
         custom_response = jsonify(
             ValidationHelper().id_cannot_be_zero_response), 400
@@ -102,7 +102,7 @@ def delete_a_party(pid):
 
 
 @PARTY_BP_V2.route("/parties/<int:pid>/name", methods=["PATCH"])
-def party_editor(pid):
+def edit_party_name(pid):
     """ Edit politcal party  name by ID"""
     custom_response = None
     party_updates = request.get_json(force=True)
@@ -116,7 +116,7 @@ def party_editor(pid):
             ValidationHelper.id_cannot_be_zero_response
         ), 400
     elif ValidationHelper().check_for_expected_value_types_in_user_input(
-            party_updates, "party update") is False:
+            party_updates) is False:
         custom_response = jsonify(
             ValidationHelper.unprocessable_data_response), 422
     elif ValidationHelper().check_for_empty_strings_in_user_input(
@@ -128,7 +128,7 @@ def party_editor(pid):
             "parties", "pid", pid) is False:
         custom_response = jsonify(
             ValidationHelper.id_out_of_range_response
-        ), 416
+        ), 404
     else:
         custom_response = jsonify({
             "status": 200,

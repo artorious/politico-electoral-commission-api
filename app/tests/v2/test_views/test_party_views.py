@@ -10,7 +10,7 @@ class TestPartiesRoutes(unittest.TestCase):
 
     def setUp(self):
         """ Init app and test vars """
-        
+
         self.app = create_app(config_mode="testing")
         with self.app.app_context():
             self.client = self.app.test_client
@@ -99,10 +99,50 @@ class TestPartyCreation(TestPartiesRoutes):
             "hq_address": "Jubilee Tower, Pangani, Thika Road",
             "logo_url": "/static/jubilee.jpeg",
         }
+        test_reg_data1 = {
+            "name": "Jubilee",
+            "hq_address": "\t",
+            "logo_url": "/static/jubilee.jpeg",
+        }
+        test_reg_data2 = {
+            "name": "Jubilee",
+            "hq_address": "Jubilee Tower, Pangani, Thika Road",
+            "logo_url": "\n",
+        }
 
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(test_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 422,
+            msg="response code SHOULD BE 422 (Unprocessable Entity) + msg"
+        )
+        self.assertEqual(
+            deserialized_response["error"], "Empty data field",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+        response = self.client().post(
+            "/api/v2/parties",
+            data=json.dumps(test_reg_data1),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 422,
+            msg="response code SHOULD BE 422 (Unprocessable Entity) + msg"
+        )
+        self.assertEqual(
+            deserialized_response["error"], "Empty data field",
+            msg="Response Body Contents- Should be custom message "
+        )
+
+        response = self.client().post(
+            "/api/v2/parties",
+            data=json.dumps(test_reg_data2),
             headers={'content-type': 'application/json'}
         )
         deserialized_response = json.loads(response.data.decode())
@@ -153,9 +193,14 @@ class TestPartyCreation(TestPartiesRoutes):
             response.status_code, 201,
             msg="response code SHOULD BE 201 (Created)"
         )
+        party_reg_data = {
+                "name": "Jubilee",
+                "hq_address": "None Tower, Pangani, Thika Road",
+                "logo_url": "/static/jubilee1.jpeg"
+            }
         response = self.client().post(
             "/api/v2/parties",
-            data=json.dumps(self.party_reg_data),
+            data=json.dumps(party_reg_data),
             headers={'content-type': 'application/json'}
         )
         deserialized_response = json.loads(response.data.decode())
@@ -165,7 +210,74 @@ class TestPartyCreation(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Entity already exists",
+            "Conflict - Party already exists",
+            msg="Response Body Contents- Should be custom message "
+        )
+    def test_party_creation_with_already_existing_party_logo(self):
+        """ Test that a party logo cannot be used twice
+        """
+        response = self.client().post(
+            "/api/v2/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+        party_reg_data = {
+                "name": "A party",
+                "hq_address": "An Address",
+                "logo_url": "/static/jubilee.jpeg"
+            }
+        response = self.client().post(
+            "/api/v2/parties",
+            data=json.dumps(party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 409,
+            msg="response code SHOULD BE 409 (Conflict)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Conflict - Logo already in use",
+            msg="Response Body Contents- Should be custom message "
+        )
+    def test_party_creation_with_already_existing_party_hq(self):
+        """ Test that a party headquarters cannot be registered twice
+        """
+        response = self.client().post(
+            "/api/v2/parties",
+            data=json.dumps(self.party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (Created)"
+        )
+
+        party_reg_data = {
+                "name": "A party",
+                "hq_address": "Jubilee Tower, Pangani, Thika Road",
+                "logo_url": "url-goes-here"
+            }
+        response = self.client().post(
+            "/api/v2/parties",
+            data=json.dumps(party_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 409,
+            msg="response code SHOULD BE 409 (Conflict)"
+        )
+        self.assertEqual(
+            deserialized_response["error"],
+            "Conflict - Address already in use",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -205,13 +317,13 @@ class TestFetchingParty(TestPartiesRoutes):
         )
 
     def test_fetching_a_party_with_a_valid_id_that_is_out_of_bound(self):
-        """ Test with a integer that is out of bound (416 - Out of range)"""
+        """ Test with a integer that is out of Range"""
 
         response = self.client().get("/api/v2/parties/1000")
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
-            response.status_code, 416, msg="Should be 416 - Out of range"
+            response.status_code, 404, msg="Should be 404"
         )
         self.assertEqual(
             deserialized_response["error"],
@@ -282,13 +394,13 @@ class TestDeleteParty(TestPartiesRoutes):
         )
 
     def test_deleting_party_with_an_out_of_bound_id(self):
-        """ Test with a integer that is out of bound (416 - Out of range)"""
+        """ Test with a integer that is out of range"""
 
         response = self.client().delete("/api/v2/parties/1000")
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
-            response.status_code, 416, msg="Should be 416 - Out of range"
+            response.status_code, 404, msg="Should be 404"
         )
         self.assertEqual(
             deserialized_response["error"],
@@ -369,7 +481,7 @@ class TestEditParty(TestPartiesRoutes):
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
-            response.status_code, 416, msg="Should be 416 - Out of range"
+            response.status_code, 404, msg="Should be 404"
         )
         self.assertEqual(
             deserialized_response["error"],
