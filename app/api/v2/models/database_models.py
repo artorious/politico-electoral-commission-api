@@ -138,6 +138,7 @@ class DatabaseManager:
         try:
             self.cursor.execute("DROP TABLE IF EXISTS parties CASCADE")
             self.cursor.execute("DROP TABLE IF EXISTS offices CASCADE")
+            self.cursor.execute("DROP TABLE IF EXISTS users CASCADE")
             print("Tables Dropped Successfully")
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)

@@ -45,13 +45,13 @@ def create_app(config_mode):
     from app.api.v1.views import office_views as offices_v1
     from app.api.v2.views import party_views as parties_v2
     from app.api.v2.views import office_views as offices_v2
-    # from app.api.v2.views import users_views as users_v2
+    from app.api.v2.views import users_views as users_v2
     # Register Blueprints
     app.register_blueprint(parties_v1.PARTY_BP_V1)
     app.register_blueprint(offices_v1.OFFICE_BP_V1)
     app.register_blueprint(parties_v2.PARTY_BP_V2)
     app.register_blueprint(offices_v2.OFFICE_BP_V2)
-    # app.register_blueprint(users_v2.AUTH_BP_V2)
+    app.register_blueprint(users_v2.AUTH_BP_V2)
     # Custom error handlers
     app.register_error_handler(404, page_not_found_error)
     app.register_error_handler(400, bad_user_request_error)

@@ -42,7 +42,6 @@ class PoliticalParties(ValidationHelper):
     def validate_party_reg_data(self):
         """ Validate Party Registartion Data"""
         custom_response = None
-        cartegory = "party registration"
         if self.check_for_expected_keys_in_user_input(
                 self.party_reg_data, ["name", "hq_address", "logo_url"]
         ) is False:
