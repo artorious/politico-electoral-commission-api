@@ -27,3 +27,8 @@ def create_user():
     else:
         custom_response = sample_user.validate_user_reg_data()
     return custom_response
+
+
+@AUTH_BP_V2.route("/login", methods=["POST"])
+def login():
+    pass

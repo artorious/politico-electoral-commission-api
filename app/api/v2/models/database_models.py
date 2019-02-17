@@ -29,7 +29,6 @@ class DatabaseManager:
             firstname VARCHAR(50) NOT NULL, \
             lastname VARCHAR(50) NOT NULL, \
             othername VARCHAR(50) NOT NULL, \
-            authtoken TEXT UNIQUE NOT NULL, \
             email VARCHAR(50) UNIQUE NOT NULL, \
             telephone VARCHAR(50) UNIQUE NOT NULL, \
             passport_url TEXT UNIQUE NOT NULL, \
@@ -106,8 +105,6 @@ class DatabaseManager:
     def edit_a_table_record(self, table, entity_id, new_data):
         """ Edit/update a record """
         custom_msg = None
-
-        # for item in
         try:
             self.cursor.execute(
                 f"update {table} set name = '{new_data['name']}' " +

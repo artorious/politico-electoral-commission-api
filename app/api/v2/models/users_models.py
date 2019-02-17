@@ -74,15 +74,14 @@ class Users(ValidationHelper):
         custom_msg = None
         try:
             self.cursor.execute("""
-            INSERT INTO users (uid, firstname, lastname, othername, authtoken,
+            INSERT INTO users (uid, firstname, lastname, othername,
             email, telephone, passport_url, login_status,
             registration_timestamp, last_login_timestamp, is_admin, password)
-            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING uid;""", (
                 self.user_reg_data["first_name"],
                 self.user_reg_data["last_name"],
                 self.user_reg_data["other_name"],
-                "Not yet assigned",
                 self.user_reg_data["email"],
                 self.user_reg_data["telephone"],
                 self.user_reg_data["passport_url"],
@@ -96,10 +95,6 @@ class Users(ValidationHelper):
             last_id = self.cursor.fetchall()
             uid = last_id[0]["uid"]
             auth_token_byte_str = self.generate_token(uid)
-            self.cursor.execute(
-                "UPDATE users SET authtoken = %s WHERE uid = %s;", (
-                    auth_token_byte_str, uid))
-
             custom_msg = {"status": 201, "user": [{
                 "authentication token": auth_token_byte_str.decode(),
                 "login email": self.user_reg_data["email"],

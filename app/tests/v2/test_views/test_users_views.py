@@ -25,6 +25,8 @@ class TestUserRoutes(unittest.TestCase):
                 "password": "apassword",
                 "confirm_password": "apassword"
             }
+            self.user_login_data = {
+                "email": "ngondez@email.com", "password": "apassword"}
 
     def tearDown(self):
         with self.app.app_context():
@@ -475,6 +477,43 @@ class TestUserCreation(TestUserRoutes):
             "Conflict - Phone number already registered",
             msg="Response Body Contents- Should be custom message "
         )
+
+
+class TestUserLogin(TestUserRoutes):
+    """ Tescases for Login """
+
+    def test_with_a_registered_user_and_valid_login_details(self):
+        """ Test that valid crediantials successfully login - 200(ok)"""
+        response = self.client().post(
+            "/api/v2/auth/signup", data=self.user_reg_data)
+        self.assertEqual(response.status_code, 201, msg="should be 200")
+        login_response = sel.client().post(
+            "/api/v2/auth/login", data=self.user_login_data)
+
+        deserialized_response = json.loads(login_response.data.decode())
+
+        self.assertEqual(
+            deserialized_response.status_code, 200, msg="should be 200")
+
+        self.assertIn("message", deserialized_response)
+        self.assertIn(
+            "authentication token", deserialized_response["message"][0])
+        self.assertIn(
+            "user", deserialized_response["message"][0])
+
+    def test_with_a_non_registered_login_details(self):
+        """ Test unregistered crediantials cannot log in - 401 Unaothorized)"""
+        unregistered_user = {
+            "email": "unregistered@email.com",
+            "password": "fakepassword"}
+        response = self.client().post("/api/v2/auth/login", data=unregistered)
+        deserialized_response = json.loads(response.data.decode())
+        self.assertEqual(
+            response.status_code, 401,
+            msg="Should be 401")
+        self.assertEqual(
+            deserialized_response["error"], "Invalid email or password, Please try again")
+
 
 
 if __name__ == "__main__":
