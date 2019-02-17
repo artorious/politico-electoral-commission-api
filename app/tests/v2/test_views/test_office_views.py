@@ -13,7 +13,7 @@ class TestOfficeRoutes(unittest.TestCase):
         self.app = create_app(config_mode="testing")
         with self.app.app_context():
             self.client = self.app.test_client
-        
+
             self.federal_office_reg_data = {
                 "name": "President of the Republic",
                 "type": "Federal"
@@ -44,9 +44,14 @@ class TestOfficeCreation(TestOfficeRoutes):
             data=json.dumps(self.federal_office_reg_data),
             headers={'content-type': 'application/json'}
         )
-        response_in_json = json.loads(
-            response.data.decode('utf-8').replace("'", "\""))
-        self.assertIn("status", response_in_json)
+        deserialized_response = json.loads(response.data.decode())
+        self.assertIn("office", deserialized_response)
+
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (created)"
+        )
+
 
     def test_ofice_creation_with_more_fields_than_is_expected(self):
         """ Test with more fields than expected. """
@@ -176,7 +181,7 @@ class TestFetchingOffice(TestOfficeRoutes):
             data=json.dumps(self.federal_office_reg_data),
             headers={'content-type': 'application/json'}
         )
-        
+
         response = self.client().get('/api/v2/offices/1')
         self.assertEqual(response.status_code, 200, msg="Should be 200(ok)")
         self.assertIn("status", str(response.data))

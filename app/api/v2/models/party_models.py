@@ -42,7 +42,6 @@ class PoliticalParties(ValidationHelper):
     def validate_party_reg_data(self):
         """ Validate Party Registartion Data"""
         custom_response = None
-        cartegory = "party registration"
         if self.check_for_expected_keys_in_user_input(
                 self.party_reg_data, ["name", "hq_address", "logo_url"]
         ) is False:
@@ -51,7 +50,7 @@ class PoliticalParties(ValidationHelper):
                 self.party_reg_data) is False:
             custom_response = jsonify(self.unprocessable_data_response), 422
         elif self.check_for_empty_strings_in_user_input(
-                self.party_reg_data, "party registration") is False:
+                self.party_reg_data) is True:
             custom_response = jsonify(self.empty_data_field_response), 422
         elif self.lookup_whether_entity_exists_in_a_table_by_attrib(
                 "parties", "name", self.party_reg_data["name"]) is True:

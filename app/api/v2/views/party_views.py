@@ -120,7 +120,7 @@ def edit_party_name(pid):
         custom_response = jsonify(
             ValidationHelper.unprocessable_data_response), 422
     elif ValidationHelper().check_for_empty_strings_in_user_input(
-            party_updates, "party update") is False:
+            party_updates) is True:
         custom_response = jsonify(
             ValidationHelper.empty_data_field_response
         ), 422

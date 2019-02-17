@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
-""" Methods to validate data """
+""" Holds Methods to Validate App data """
+import re
 from app.api.v2.models.database_models import DatabaseManager
 
 
 class ValidationHelper(DatabaseManager):
     """ Methods that Validate user input"""
-    def __init__(self):
-        super().__init__()
-    """ Validation methods """
-    expected_party_fields = ["name", "hq_address", "logo_url"]
-
     more_data_fields_response = {
         "status": 400, "error": "Bad Query - More data fields than expected"
     }
@@ -25,14 +21,39 @@ class ValidationHelper(DatabaseManager):
     party_already_exists_response = {
         "status": 409, "error": "Conflict - Party already exists"
     }
+    email_already_exists_response = {
+        "status": 409, "error": "Conflict - Email already in use"
+    }
     logo_already_exists_response = {
         "status": 409, "error": "Conflict - Logo already in use"
+    }
+    passport_already_exists_response = {
+        "status": 409, "error": "Conflict - Passport photo already in use"
     }
     hq_already_exists_response = {
         "status": 409, "error": "Conflict - Address already in use"
     }
+    telephone_already_exists_response = {
+        "status": 409, "error": "Conflict - Phone number already registered"
+    }
     id_out_of_range_response = {
         "status": 404, "error": "Entity not in server. ID out of range."
+    }
+    unexpected_data_types_resp = {
+        "status": 422,
+        "error": "Unexpected data types. Expectes strings only"
+    }
+    invalid_password_length_resp = {
+        "status": 422,
+        "error": "Invalid Password Length. 6 Characters minimum"
+    }
+    invalid_email_syntax_resp = {
+        "status": 422,
+        "error": "Invalid Email Syntax"
+    }
+    mismatched_email_resp = {
+        "status": 422,
+        "error": "Passwords do not match"
     }
     unprocessable_data_response = {
         "status": 422,
@@ -42,55 +63,37 @@ class ValidationHelper(DatabaseManager):
         "status": 422, "error": "Empty data field"
     }
 
-    def check_for_expected_keys_in_user_input(
-        self, raw_data, expected_party_fields
-    ):
+    @staticmethod
+    def check_for_expected_keys_in_user_input(raw_data, expected_party_fields):
         """ (dict, list) -> bool
-            Check for expected dict keys in user_input.
+            Check for the expected fields in user_input.
             Return True/False
         """
         return list(raw_data.keys()) == expected_party_fields
 
-    def check_for_empty_strings_in_user_input(self, raw_data, cartegory):
-        """ Truthy """
-        custom_msg = None
-        if cartegory == "party registration":
-            if "" in raw_data.values():
-                custom_msg = False
+    @staticmethod
+    def check_for_empty_strings_in_user_input(raw_data):
+        """
+            Checks for empty strings in user data
+            Returns True/False
+        """
+        items_list = list(raw_data.values())
+        return any(item.strip() == "" for item in items_list)
 
-            elif (
-                raw_data["name"].isspace() or
-                raw_data["hq_address"].isspace() or
-                raw_data["logo_url"].isspace()
-            ):
-                custom_msg = False
-            else:
-                custom_msg = True
-        elif cartegory == "party update":
-            if raw_data["name"].strip() == "" or raw_data["name"].isspace():
-                custom_msg = False
-            else:
-                custom_msg = True
-        elif cartegory == "office registration":
-            if "" in raw_data.values():
-                custom_msg = False
-            elif (
-                raw_data["name"].isspace() or
-                raw_data["type"].isspace()
-            ):
-                custom_msg = False
-            else:
-                custom_msg = True
-
-        return custom_msg
-
-    def check_for_expected_value_types_in_user_input(self, raw_data):
+    @staticmethod
+    def check_for_expected_value_types_in_user_input(raw_data):
         """ (dict) -> bool
+
             Check for expected value types
-            eturn True/False
+            return True/False
         """
         values_list = list(raw_data.values())
         return all(isinstance(item, str) for item in values_list)
 
-    def check_for_expected_no_of_fields(self, raw_data, cartegory):
-        pass
+    @staticmethod
+    def check_valid_email_syntax(email):
+        """
+            Valdate email address
+            Source: https://pythonspot.com/regular-expressions/
+        """
+        return re.match(r'[^@]+@[^@]+\.[^@]+', email)

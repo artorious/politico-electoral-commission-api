@@ -50,8 +50,7 @@ class PoliticalOffices(ValidationHelper):
                 self.office_reg_data) is False:
             custom_response = jsonify(self.unprocessable_data_response), 422
         elif self.check_for_empty_strings_in_user_input(
-                self.office_reg_data, "office registration"
-        ) is False:
+                self.office_reg_data) is True:
             custom_response = jsonify(self.empty_data_field_response), 422
         elif self.lookup_whether_entity_exists_in_a_table_by_attrib(
                 "offices", "name", self.office_reg_data["name"]
