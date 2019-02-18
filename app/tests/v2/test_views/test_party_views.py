@@ -25,15 +25,43 @@ class TestPartiesRoutes(unittest.TestCase):
             db = DatabaseManager()
             db.drop_tables()
 
+    def signup_helper(self):
+        """ Helper method fot test registration """
+        test_user ={
+            "first_name": "Arthur",
+            "last_name": "Ngondo",
+            "other_name": "admin",
+            "email": "arthur@admin.com",
+            "telephone": "+254727161173",
+            "passport_url": "images/arthur.jpg",
+            "password": "abcdefghijkl",
+            "confirm_password": "abcdefghijkl"
+        }
+        return self.client().post("/api/v2/signup", data=json.dumps(test_user))
+
+    def login_helper(self):
+        """ Helper method for test logins """
+        test_user = { "email": "arthur@admin.com", "password": "abcdefghijkl",}
+        return self.client().post("/api/v2/auth/login", data=json.dumps(test_user))
 
 class TestPartyCreation(TestPartiesRoutes):
     """ Tests for creating a political party """
     def test_party_creation_with_valid_data(self):
         """test with valid data - 201 (created) + data"""
+
+        self.signup_helper()
+        login_results = self.login_helper()
+
+        print(login_results.data)  ########### TODO: Remove
+        auth_token = json.loads(login_results.data)["message"][0]["authentication token"]
+        auth_header=dict(Authorization="Bearer " + auth_token)
+        content_header = {"content-type": "application/json"}
+
+
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=content_header.update(auth_header)
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertIn("party", deserialized_response)
@@ -279,7 +307,6 @@ class TestPartyCreation(TestPartiesRoutes):
             "Conflict - Address already in use",
             msg="Response Body Contents- Should be custom message "
         )
-
 
 
 

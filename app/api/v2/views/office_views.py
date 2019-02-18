@@ -36,7 +36,7 @@ def fetch_all_offices():
 @OFFICE_BP_V2.route("/offices", methods=["POST"])
 def create_an_office():
     """ Create a political office """
-    custom_response = None
+    # custom_response = None
     office_reg_data = request.get_json(force=True)
     sample_office = PoliticalOffices(office_reg_data)
 

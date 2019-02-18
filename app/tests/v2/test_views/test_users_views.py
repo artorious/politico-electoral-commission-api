@@ -28,11 +28,13 @@ class TestUserRoutes(unittest.TestCase):
             self.user_login_data = {
                 "email": "ngondez@email.com", "password": "apassword"}
 
+
     def tearDown(self):
         with self.app.app_context():
             db = DatabaseManager()
             db.drop_tables()
 
+    
 
 class TestUserCreation(TestUserRoutes):
     """ Test Cases for user signup"""
@@ -480,21 +482,27 @@ class TestUserCreation(TestUserRoutes):
 
 
 class TestUserLogin(TestUserRoutes):
-    """ Tescases for Login """
+    """ Test cases for Login """
 
     def test_with_a_registered_user_and_valid_login_details(self):
         """ Test that valid crediantials successfully login - 200(ok)"""
         response = self.client().post(
-            "/api/v2/auth/signup", data=self.user_reg_data)
-        self.assertEqual(response.status_code, 201, msg="should be 200")
-        login_response = sel.client().post(
-            "/api/v2/auth/login", data=self.user_login_data)
+            "/api/v2/auth/signup",
+            data=json.dumps(self.user_reg_data),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            response.status_code, 201,
+            msg="response code SHOULD BE 201 (created)"
+        )
+
+
+        login_response = self.client().post(
+            "/api/v2/auth/login", data=json.dumps(self.user_login_data))
+        self.assertEqual(
+            login_response.status_code, 200, msg="should be 200")
 
         deserialized_response = json.loads(login_response.data.decode())
-
-        self.assertEqual(
-            deserialized_response.status_code, 200, msg="should be 200")
-
         self.assertIn("message", deserialized_response)
         self.assertIn(
             "authentication token", deserialized_response["message"][0])
@@ -506,14 +514,13 @@ class TestUserLogin(TestUserRoutes):
         unregistered_user = {
             "email": "unregistered@email.com",
             "password": "fakepassword"}
-        response = self.client().post("/api/v2/auth/login", data=unregistered)
+        response = self.client().post("/api/v2/auth/login", data=json.dumps(unregistered_user))
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
             response.status_code, 401,
             msg="Should be 401")
         self.assertEqual(
             deserialized_response["error"], "Invalid email or password, Please try again")
-
 
 
 if __name__ == "__main__":

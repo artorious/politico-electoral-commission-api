@@ -75,9 +75,9 @@ class Users(ValidationHelper):
         try:
             self.cursor.execute("""
             INSERT INTO users (uid, firstname, lastname, othername,
-            email, telephone, passport_url, login_status,
-            registration_timestamp, last_login_timestamp, is_admin, password)
-            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            email, telephone, passport_url,registration_timestamp,
+            last_login_timestamp, is_admin, password)
+            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING uid;""", (
                 self.user_reg_data["first_name"],
                 self.user_reg_data["last_name"],
@@ -85,7 +85,6 @@ class Users(ValidationHelper):
                 self.user_reg_data["email"],
                 self.user_reg_data["telephone"],
                 self.user_reg_data["passport_url"],
-                False,
                 time.asctime(time_obj),
                 "Not logged in Yet",
                 False,
@@ -96,7 +95,7 @@ class Users(ValidationHelper):
             uid = last_id[0]["uid"]
             auth_token_byte_str = self.generate_token(uid)
             custom_msg = {"status": 201, "user": [{
-                "authentication token": auth_token_byte_str.decode(),
+                "authentication token": auth_token_byte_str,
                 "login email": self.user_reg_data["email"],
                 "Message": "Registration successful please login"
             }]}
@@ -110,6 +109,7 @@ class Users(ValidationHelper):
     @staticmethod
     def generate_token(uid):
         """ Generates and returns the access token byte string """
+        print(f"#########-> {uid} -- {type(uid)}")
         try:
             payload = {
                 'exp': datetime.utcnow() + timedelta(hours=24),
@@ -120,22 +120,15 @@ class Users(ValidationHelper):
                 payload,
                 current_app.config.get('SECRET'),
                 algorithm='HS256'
-            )
+            ).decode('utf-8')
             return token_byte_str
         except Exception as err:
             return str(err)
 
-    @staticmethod
-    def decode_token(token):
-        """Decodes the access token from the Authorization header."""
-        try:
-            payload = jwt.decode(token, current_app.config.get('SECRET'))
-            return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return "Expired has token. Please login to get a new token"
-        except jwt.InvalidTokenError:
-            return "Invalid token detected. Please register or login"
 
     def __repr__(self):
         """ Return current user name """
         return f'User Login Email - {self.user_reg_data["email"]}'
+
+
+

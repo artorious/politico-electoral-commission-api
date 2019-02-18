@@ -30,15 +30,21 @@ class TestOfficeRoutes(unittest.TestCase):
                 "name": "Member of county Assenbly",
                 "type": "Local Government"
             }
+
     def tearDown(self):
         with self.app.app_context():
             db = DatabaseManager()
             db.drop_tables()
 
+
+
 class TestOfficeCreation(TestOfficeRoutes):
     """ Tests for creating a political party """
+
     def test_office_creation_with_valid_data(self):
         """ Test office creation with valid data """
+
+
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(self.federal_office_reg_data),
