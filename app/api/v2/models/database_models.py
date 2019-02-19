@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """ Methods for querying the database """
 import sys
+import time
 import psycopg2
+import bcrypt
 import psycopg2.extras
 from flask import current_app
 
@@ -29,11 +31,9 @@ class DatabaseManager:
             firstname VARCHAR(50) NOT NULL, \
             lastname VARCHAR(50) NOT NULL, \
             othername VARCHAR(50) NOT NULL, \
-            authtoken TEXT UNIQUE NOT NULL, \
             email VARCHAR(50) UNIQUE NOT NULL, \
             telephone VARCHAR(50) UNIQUE NOT NULL, \
             passport_url TEXT UNIQUE NOT NULL, \
-            login_status BOOLEAN NOT NULL, \
             registration_timestamp VARCHAR(50) NOT NULL, \
             last_login_timestamp VARCHAR(50) NOT NULL, \
             is_admin BOOLEAN NOT NULL, \
@@ -49,7 +49,7 @@ class DatabaseManager:
             self.cursor = self.conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor
             )
-            # self.cursor = self.conn.cursor()
+
         except psycopg2.DatabaseError as err:
             print(f"Error connecting to DB: {err}")
 
@@ -106,8 +106,6 @@ class DatabaseManager:
     def edit_a_table_record(self, table, entity_id, new_data):
         """ Edit/update a record """
         custom_msg = None
-
-        # for item in
         try:
             self.cursor.execute(
                 f"update {table} set name = '{new_data['name']}' " +
@@ -154,3 +152,45 @@ class DatabaseManager:
         """ Closes database connection """
         if self.conn:
             self.conn.close()
+
+    def fetch_entity_id(self, id_type, table, attrib, value):
+        """ Fetch ID from <table> where <attrib> is <value> """
+        try:
+            self.cursor.execute(
+                f"SELECT * from {table} WHERE {attrib}='{value}';"
+            )
+            user_record = self.cursor.fetchall()
+            fetched_id = user_record[0][id_type]
+
+            return fetched_id
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+
+    def verify_user_password(self, password, email):
+        """
+        Checks the password against it's hash to validates the user's password
+        Truthy
+        """
+        unverified_password = password.encode()
+        try:
+            self.cursor.execute(
+                f"SELECT * from users WHERE email='{email}';"
+            )
+            user_record = self.cursor.fetchall()
+            hashed_password_str = user_record[0]["password"]
+
+            hashed_password_bytes = hashed_password_str.encode()
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+
+        return bcrypt.checkpw(unverified_password, hashed_password_bytes)
+
+    def update_login_timestamp(self, email):
+        time_obj = time.localtime(time.time())
+        try:
+            self.cursor.execute(
+                f"update users set last_login_timestamp = '{time.asctime(time_obj)}' " +
+                f"where email='{email}';"
+            )
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)

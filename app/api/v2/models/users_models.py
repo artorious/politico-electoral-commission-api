@@ -74,19 +74,17 @@ class Users(ValidationHelper):
         custom_msg = None
         try:
             self.cursor.execute("""
-            INSERT INTO users (uid, firstname, lastname, othername, authtoken,
-            email, telephone, passport_url, login_status,
-            registration_timestamp, last_login_timestamp, is_admin, password)
-            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO users (uid, firstname, lastname, othername,
+            email, telephone, passport_url,registration_timestamp,
+            last_login_timestamp, is_admin, password)
+            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING uid;""", (
                 self.user_reg_data["first_name"],
                 self.user_reg_data["last_name"],
                 self.user_reg_data["other_name"],
-                "Not yet assigned",
                 self.user_reg_data["email"],
                 self.user_reg_data["telephone"],
                 self.user_reg_data["passport_url"],
-                False,
                 time.asctime(time_obj),
                 "Not logged in Yet",
                 False,
@@ -96,12 +94,7 @@ class Users(ValidationHelper):
             last_id = self.cursor.fetchall()
             uid = last_id[0]["uid"]
             auth_token_byte_str = self.generate_token(uid)
-            self.cursor.execute(
-                "UPDATE users SET authtoken = %s WHERE uid = %s;", (
-                    auth_token_byte_str, uid))
-
             custom_msg = {"status": 201, "user": [{
-                "authentication token": auth_token_byte_str.decode(),
                 "login email": self.user_reg_data["email"],
                 "Message": "Registration successful please login"
             }]}
@@ -117,9 +110,9 @@ class Users(ValidationHelper):
         """ Generates and returns the access token byte string """
         try:
             payload = {
+                'sub': uid,
                 'exp': datetime.utcnow() + timedelta(hours=24),
-                'iat': datetime.utcnow(),
-                'sub': uid
+                'iat': datetime.utcnow()
             }
             token_byte_str = jwt.encode(
                 payload,
@@ -129,17 +122,6 @@ class Users(ValidationHelper):
             return token_byte_str
         except Exception as err:
             return str(err)
-
-    @staticmethod
-    def decode_token(token):
-        """Decodes the access token from the Authorization header."""
-        try:
-            payload = jwt.decode(token, current_app.config.get('SECRET'))
-            return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return "Expired has token. Please login to get a new token"
-        except jwt.InvalidTokenError:
-            return "Invalid token detected. Please register or login"
 
     def __repr__(self):
         """ Return current user name """

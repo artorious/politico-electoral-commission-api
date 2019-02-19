@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """ Holds Methods to Validate App data """
 import re
+import jwt
+from flask import current_app
 from app.api.v2.models.database_models import DatabaseManager
 
 
@@ -8,6 +10,9 @@ class ValidationHelper(DatabaseManager):
     """ Methods that Validate user input"""
     more_data_fields_response = {
         "status": 400, "error": "Bad Query - More data fields than expected"
+    }
+    unkown_fields_response = {
+        "status": 400, "error": "Bad Query - Unexpected fields."
     }
     few_data_fields_response = {
         "status": 400, "error": "Bad Query - Fewer data fields than expected"
@@ -83,7 +88,6 @@ class ValidationHelper(DatabaseManager):
     @staticmethod
     def check_for_expected_value_types_in_user_input(raw_data):
         """ (dict) -> bool
-
             Check for expected value types
             return True/False
         """
@@ -97,3 +101,15 @@ class ValidationHelper(DatabaseManager):
             Source: https://pythonspot.com/regular-expressions/
         """
         return re.match(r'[^@]+@[^@]+\.[^@]+', email)
+
+    @staticmethod
+    def decode_token(token):
+        """Decodes the access token from the Authorization header."""
+        try:
+            payload = jwt.decode(
+                token, current_app.config.get('SECRET'), algorithms=['HS256'])
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return "Expired has token. Please login to get a new token"
+        except jwt.InvalidTokenError as err:
+            return "Invalid token detected. Please register or login"

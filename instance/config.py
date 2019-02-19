@@ -11,6 +11,7 @@ class BaseConfig:
 class DevelopmentConfig(BaseConfig):
     """ Development mode configurations """
     DEBUG = True
+    JSON_SORT_KEYS = False
 
 class TestingConfig(BaseConfig):
     """ Testing mode configurations """
