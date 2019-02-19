@@ -30,6 +30,26 @@ class TestOfficeRoutes(unittest.TestCase):
                 "name": "Member of county Assenbly",
                 "type": "Local Government"
             }
+            self.test_user_signup_data = {
+                "first_name": "Florence",
+                "last_name": "Ruguru",
+                "other_name": "flojo",
+                "email": "ruguru@email.com",
+                "telephone": "+25418980",
+                "passport_url": "images/flo.jpg",
+                "password": "abcdefghijkl",
+                "confirm_password": "abcdefghijkl"
+            }
+            self.test_user_login_data = {
+                "email": "ruguru@email.com", "password": "abcdefghijkl"}
+            resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
+            login_results = self.client().post("/api/v2/auth/login", data=json.dumps(self.test_user_login_data))
+
+
+            auth_token = json.loads(login_results.data)["message"][0]["token"]
+
+            self.updated_header = {"content-type": "application/json", "Authorization": f"Bearer {auth_token}"}
+
 
     def tearDown(self):
         with self.app.app_context():
@@ -43,12 +63,10 @@ class TestOfficeCreation(TestOfficeRoutes):
 
     def test_office_creation_with_valid_data(self):
         """ Test office creation with valid data """
-
-
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(self.federal_office_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertIn("office", deserialized_response)
@@ -70,7 +88,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(test_extra_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -90,7 +108,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(test_insufficient_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -117,7 +135,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(empty_governer_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -133,7 +151,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(empty_local_govt_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -151,13 +169,13 @@ class TestOfficeCreation(TestOfficeRoutes):
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(self.legislative_office_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(self.legislative_office_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -175,7 +193,7 @@ class TestFetchingOffice(TestOfficeRoutes):
     """ Test for feching a single political office by ID """
     def test_fetching_of_created_offices(self):
         """ Test succesful fetch of all messages """
-        response = self.client().get("/api/v2/offices")
+        response = self.client().get("/api/v2/offices", headers=self.updated_header)
         self.assertEqual(response.status_code, 200)
         self.assertIn("data", str(response.data))
         self.assertIn("status", str(response.data))
@@ -185,16 +203,16 @@ class TestFetchingOffice(TestOfficeRoutes):
         response = self.client().post(
             "/api/v2/offices",
             data=json.dumps(self.federal_office_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
-        response = self.client().get('/api/v2/offices/1')
+        response = self.client().get('/api/v2/offices/1', headers=self.updated_header)
         self.assertEqual(response.status_code, 200, msg="Should be 200(ok)")
         self.assertIn("status", str(response.data))
 
     def test_fetching_an_office_with_a_negative_id_value(self):
         """ Test with a negative integer """
-        response = self.client().get("/api/v2/offices/-1")
+        response = self.client().get("/api/v2/offices/-1", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -209,7 +227,7 @@ class TestFetchingOffice(TestOfficeRoutes):
     def test_fetching_an_office_with_a_valid_id_that_is_out_of_bound(self):
         """ Test with a integer that is out of bound (416 - Out of range)"""
 
-        response = self.client().get("/api/v2/offices/1000")
+        response = self.client().get("/api/v2/offices/1000", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -223,7 +241,7 @@ class TestFetchingOffice(TestOfficeRoutes):
 
     def test_fetching_an_office_with_a_floating_point_value_for_id(self):
         """ Test with a floating point number """
-        response = self.client().get("/api/v2/offices/1.0")
+        response = self.client().get("/api/v2/offices/1.0", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -238,7 +256,7 @@ class TestFetchingOffice(TestOfficeRoutes):
 
     def test_fetching_an_office_with_a_non_numeric_value_for_id(self):
         """ Test fetching with a non-numeric character 404 Not found """
-        response = self.client().get("/api/v2/office/one")
+        response = self.client().get("/api/v2/office/one", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -253,7 +271,7 @@ class TestFetchingOffice(TestOfficeRoutes):
 
     def test_fetching_an_office_without_providing_a_value_blank_field(self):
         """ 400 - Bad query"""
-        response = self.client().get("/api/v2/offices/")
+        response = self.client().get("/api/v2/offices/", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(

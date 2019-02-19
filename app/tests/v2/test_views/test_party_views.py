@@ -19,49 +19,41 @@ class TestPartiesRoutes(unittest.TestCase):
                 "hq_address": "Jubilee Tower, Pangani, Thika Road",
                 "logo_url": "/static/jubilee.jpeg"
             }
+            self.test_user_signup_data = {
+                "first_name": "Florence",
+                "last_name": "Ruguru",
+                "other_name": "flojo",
+                "email": "ruguru@email.com",
+                "telephone": "+25418980",
+                "passport_url": "images/flo.jpg",
+                "password": "abcdefghijkl",
+                "confirm_password": "abcdefghijkl"
+            }
+            self.test_user_login_data = {
+                "email": "ruguru@email.com", "password": "abcdefghijkl"}
+            resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
+            login_results = self.client().post("/api/v2/auth/login", data=json.dumps(self.test_user_login_data))
+
+
+            auth_token = json.loads(login_results.data)["message"][0]["token"]
+
+            self.updated_header = {"content-type": "application/json", "Authorization": f"Bearer {auth_token}"}
 
     def tearDown(self):
         with self.app.app_context():
             db = DatabaseManager()
             db.drop_tables()
 
-    def signup_helper(self):
-        """ Helper method fot test registration """
-        test_user ={
-            "first_name": "Arthur",
-            "last_name": "Ngondo",
-            "other_name": "admin",
-            "email": "arthur@admin.com",
-            "telephone": "+254727161173",
-            "passport_url": "images/arthur.jpg",
-            "password": "abcdefghijkl",
-            "confirm_password": "abcdefghijkl"
-        }
-        return self.client().post("/api/v2/signup", data=json.dumps(test_user))
-
-    def login_helper(self):
-        """ Helper method for test logins """
-        test_user = { "email": "arthur@admin.com", "password": "abcdefghijkl",}
-        return self.client().post("/api/v2/auth/login", data=json.dumps(test_user))
 
 class TestPartyCreation(TestPartiesRoutes):
     """ Tests for creating a political party """
     def test_party_creation_with_valid_data(self):
         """test with valid data - 201 (created) + data"""
 
-        self.signup_helper()
-        login_results = self.login_helper()
-
-        print(login_results.data)  ########### TODO: Remove
-        auth_token = json.loads(login_results.data)["message"][0]["authentication token"]
-        auth_header=dict(Authorization="Bearer " + auth_token)
-        content_header = {"content-type": "application/json"}
-
-
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers=content_header.update(auth_header)
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertIn("party", deserialized_response)
@@ -83,7 +75,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(test_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -106,7 +98,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(test_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -140,7 +132,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(test_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -155,7 +147,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(test_reg_data1),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -170,7 +162,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(test_reg_data2),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -194,7 +186,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(test_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -213,7 +205,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -228,7 +220,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -246,7 +238,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -261,7 +253,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -279,7 +271,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -295,7 +287,7 @@ class TestPartyCreation(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -317,20 +309,20 @@ class TestFetchingParty(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         self.assertEqual(
             response.status_code, 201,
             msg="response code SHOULD BE 201 (Created)"
         )
-        response = self.client().get("/api/v2/parties")
+        response = self.client().get("/api/v2/parties", headers=self.updated_header)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Political Parties", str(response.data))
         self.assertIn("status", str(response.data))
 
     def test_fetching_a_party_with_a_negative_id_value(self):
         """ Test with a negative integer """
-        response = self.client().get("/api/v1/parties/-1")
+        response = self.client().get("/api/v1/parties/-1", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -345,7 +337,7 @@ class TestFetchingParty(TestPartiesRoutes):
     def test_fetching_a_party_with_a_valid_id_that_is_out_of_bound(self):
         """ Test with a integer that is out of Range"""
 
-        response = self.client().get("/api/v2/parties/1000")
+        response = self.client().get("/api/v2/parties/1000", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -359,7 +351,7 @@ class TestFetchingParty(TestPartiesRoutes):
 
     def test_fetching_a_party_with_a_floating_point_value_for_id(self):
         """ Test with a floating point number """
-        response = self.client().get("/api/v2/parties/1.0")
+        response = self.client().get("/api/v2/parties/1.0", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -374,7 +366,7 @@ class TestFetchingParty(TestPartiesRoutes):
 
     def test_fetching_a_party_with_a_non_numeric_value_for_id(self):
         """ Test fetching with a non-numeric character 404 Not found """
-        response = self.client().get("/api/v2/parties/one")
+        response = self.client().get("/api/v2/parties/one", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -389,7 +381,7 @@ class TestFetchingParty(TestPartiesRoutes):
 
     def test_fetching_a_party_without_providing_a_value_blank_field(self):
         """ 400 - Bad query"""
-        response = self.client().get("/api/v2/parties/")
+        response = self.client().get("/api/v2/parties/", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -407,7 +399,7 @@ class TestDeleteParty(TestPartiesRoutes):
 
     def test_deleting_party_with_a_negative_id(self):
         """ Test deleting with a negative ID"""
-        response = self.client().delete("/api/v2/parties/-1")
+        response = self.client().delete("/api/v2/parties/-1", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -422,7 +414,7 @@ class TestDeleteParty(TestPartiesRoutes):
     def test_deleting_party_with_an_out_of_bound_id(self):
         """ Test with a integer that is out of range"""
 
-        response = self.client().delete("/api/v2/parties/1000")
+        response = self.client().delete("/api/v2/parties/1000", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -436,7 +428,7 @@ class TestDeleteParty(TestPartiesRoutes):
 
     def test_with_non_int_as_id(self):
         """ Try to delete with an ID that isnt an int """
-        response = self.client().delete("/api/v2/parties/one")
+        response = self.client().delete("/api/v2/parties/one", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
             response.status_code, 404,
@@ -450,7 +442,7 @@ class TestDeleteParty(TestPartiesRoutes):
 
     def test_test_with_float_as_id(self):
         """ Test Deleting with a floating point ID"""
-        response = self.client().delete("/api/v2/parties/1.0")
+        response = self.client().delete("/api/v2/parties/1.0", headers=self.updated_header)
         deserialized_response = json.loads(response.data.decode())
 
         self.assertEqual(
@@ -471,14 +463,14 @@ class TestEditParty(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         valid_update_data = {"name": "Ford Asili"}
         response = self.client().patch(
             "/api/v2/parties/one/name",
             data=json.dumps(valid_update_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -496,14 +488,14 @@ class TestEditParty(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         valid_update_data = {"name": "Ford Asili"}
         response = self.client().patch(
             "/api/v2/parties/100000/name",
             data=json.dumps(valid_update_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -520,14 +512,14 @@ class TestEditParty(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         valid_update_data = {"name": "Ford Asili"}
         response = self.client().patch(
             "/api/v2/parties/1.0/name",
             data=json.dumps(valid_update_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         deserialized_response = json.loads(response.data.decode())
@@ -547,14 +539,14 @@ class TestEditParty(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         valid_update_data = {"name": "Ford Asili"}
         response = self.client().patch(
             "/api/v2/parties/-1/name",
             data=json.dumps(valid_update_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         deserialized_response = json.loads(response.data.decode())
@@ -575,12 +567,12 @@ class TestEditParty(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         response = self.client().patch(
             "/api/v2/parties/1/name",
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         deserialized_response = json.loads(response.data.decode())
@@ -600,7 +592,7 @@ class TestEditParty(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         extra_update_data = {
@@ -610,7 +602,7 @@ class TestEditParty(TestPartiesRoutes):
         response = self.client().patch(
             "/api/v2/parties/1/name",
             data=json.dumps(extra_update_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertEqual(
@@ -628,14 +620,14 @@ class TestEditParty(TestPartiesRoutes):
         response = self.client().post(
             "/api/v2/parties",
             data=json.dumps(self.party_reg_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         valid_update_data = {"name": "Ford Asili"}
         response = self.client().patch(
             "/api/v2/parties/0/name",
             data=json.dumps(valid_update_data),
-            headers={'content-type': 'application/json'}
+            headers=self.updated_header
         )
 
         deserialized_response = json.loads(response.data.decode())

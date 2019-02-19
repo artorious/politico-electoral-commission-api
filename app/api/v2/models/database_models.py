@@ -49,7 +49,7 @@ class DatabaseManager:
             self.cursor = self.conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor
             )
-            # self.cursor = self.conn.cursor()
+
         except psycopg2.DatabaseError as err:
             print(f"Error connecting to DB: {err}")
 

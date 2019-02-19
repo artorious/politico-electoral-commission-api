@@ -95,7 +95,6 @@ class Users(ValidationHelper):
             uid = last_id[0]["uid"]
             auth_token_byte_str = self.generate_token(uid)
             custom_msg = {"status": 201, "user": [{
-                "authentication token": auth_token_byte_str,
                 "login email": self.user_reg_data["email"],
                 "Message": "Registration successful please login"
             }]}
@@ -109,26 +108,21 @@ class Users(ValidationHelper):
     @staticmethod
     def generate_token(uid):
         """ Generates and returns the access token byte string """
-        print(f"#########-> {uid} -- {type(uid)}")
         try:
             payload = {
+                'sub': uid,
                 'exp': datetime.utcnow() + timedelta(hours=24),
-                'iat': datetime.utcnow(),
-                'sub': uid
+                'iat': datetime.utcnow()
             }
             token_byte_str = jwt.encode(
                 payload,
                 current_app.config.get('SECRET'),
                 algorithm='HS256'
-            ).decode('utf-8')
+            )
             return token_byte_str
         except Exception as err:
             return str(err)
 
-
     def __repr__(self):
         """ Return current user name """
         return f'User Login Email - {self.user_reg_data["email"]}'
-
-
-
