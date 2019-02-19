@@ -57,12 +57,11 @@ def login():
         uid = DatabaseManager().fetch_entity_id(
             "uid", "users", "email", raw_email)
         auth_token = Users.generate_token(uid)
-        auth_token = str(auth_token)
         DatabaseManager().update_login_timestamp(raw_email)
         custom_response = jsonify({
             "status": 200,
             "message": [{
-                "token": auth_token,
+                "token": auth_token.decode('utf-8'),
                 "user": f'{raw_email} Logged in Successfuly'}]}), 200
     else:
         custom_response = jsonify({
