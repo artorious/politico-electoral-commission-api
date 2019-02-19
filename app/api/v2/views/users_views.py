@@ -45,11 +45,15 @@ def login():
 
     elif ValidationHelper().check_for_expected_keys_in_user_input(
             user_login_data, ["email", "password"]) is False:
-        custom_response = jsonify(ValidationHelper.unexpected_data_types_resp), 400
+        custom_response = jsonify(
+            ValidationHelper.unexpected_data_types_resp), 400
     raw_email = user_login_data["email"]
     raw_password = user_login_data["password"]
 
-    if DatabaseManager().lookup_whether_entity_exists_in_a_table_by_attrib("users", "email", raw_email) and DatabaseManager().verify_user_password(raw_password, raw_email):
+    if DatabaseManager().\
+        lookup_whether_entity_exists_in_a_table_by_attrib(
+            "users", "email", raw_email) and DatabaseManager().\
+            verify_user_password(raw_password, raw_email):
         uid = DatabaseManager().fetch_entity_id(
             "uid", "users", "email", raw_email)
         auth_token = Users.generate_token(uid)
@@ -57,7 +61,7 @@ def login():
         custom_response = jsonify({
             "status": 200,
             "message": [{
-                "authentication token": auth_token,
+                "token": auth_token.decode('utf-8'),
                 "user": f'{raw_email} Logged in Successfuly'}]}), 200
     else:
         custom_response = jsonify({

@@ -2,7 +2,7 @@
 """ Holds Methods to Validate App data """
 import re
 import jwt
-from flask import  current_app
+from flask import current_app
 from app.api.v2.models.database_models import DatabaseManager
 
 
@@ -88,7 +88,6 @@ class ValidationHelper(DatabaseManager):
     @staticmethod
     def check_for_expected_value_types_in_user_input(raw_data):
         """ (dict) -> bool
-
             Check for expected value types
             return True/False
         """
@@ -107,9 +106,10 @@ class ValidationHelper(DatabaseManager):
     def decode_token(token):
         """Decodes the access token from the Authorization header."""
         try:
-            payload = jwt.decode(token, current_app.config.get('SECRET'))
+            payload = jwt.decode(
+                token, current_app.config.get('SECRET'), algorithms=['HS256'])
             return payload['sub']
         except jwt.ExpiredSignatureError:
             return "Expired has token. Please login to get a new token"
-        except jwt.InvalidTokenError:
+        except jwt.InvalidTokenError as err:
             return "Invalid token detected. Please register or login"
