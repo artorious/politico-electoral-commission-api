@@ -33,10 +33,7 @@ class TestPartiesRoutes(unittest.TestCase):
                 "email": "ruguru@email.com", "password": "abcdefghijkl"}
             resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
             login_results = self.client().post("/api/v2/auth/login", data=json.dumps(self.test_user_login_data))
-
-
             auth_token = json.loads(login_results.data)["message"][0]["token"]
-
             self.updated_header = {"content-type": "application/json", "Authorization": f"Bearer {auth_token}"}
 
     def tearDown(self):

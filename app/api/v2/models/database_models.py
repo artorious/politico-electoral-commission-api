@@ -40,6 +40,25 @@ class DatabaseManager:
             password VARCHAR NOT NULL \
             );"
 
+    candidate_table_query = "CREATE TABLE IF NOT EXISTS candidates (\
+            cid SERIAL, \
+            oid INT NOT NULL,\
+            uid INT NOT NULL,\
+            pid INT NOT NULL, \
+            registration_timestamp VARCHAR(50) NOT NULL, \
+            PRIMARY KEY (oid, uid) \
+            );"
+    admin_pass = '$2b$12$Eh4hu4P8pnK1rF7JmhwpdeBsJPnuowTNfOhDBEOyfHwkXNTHKF2EC'
+    time_obj = time.localtime(time.time())
+    default_admin = """
+            INSERT INTO users (uid, firstname, lastname, othername,
+            email, telephone, passport_url,registration_timestamp,
+            last_login_timestamp, is_admin, password)
+            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
+                "Shirleen", "Njoki", "koki", "shirleen@admin.com",
+                "0727212166", "images/koki.png", time.asctime(time_obj),
+                "Not logged in Yet", True, admin_pass)
+
     def __init__(self):
         """ Initaliaze a cursor connection to DB """
         self.conn = None
@@ -58,6 +77,7 @@ class DatabaseManager:
         self.cursor.execute(self.parties_table_query)
         self.cursor.execute(self.offices_table_query)
         self.cursor.execute(self.users_table_query)
+        self.cursor.execute(self.candidate_table_query)
         print("Tables Created Succesfully")
 
     def fetch_all_records_in_a_table(self, table):
@@ -137,6 +157,7 @@ class DatabaseManager:
             self.cursor.execute("DROP TABLE IF EXISTS parties CASCADE")
             self.cursor.execute("DROP TABLE IF EXISTS offices CASCADE")
             self.cursor.execute("DROP TABLE IF EXISTS users CASCADE")
+            self.cursor.execute("DROP TABLE IF EXISTS candidates CASCADE")
             print("Tables Dropped Successfully")
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)
@@ -194,3 +215,9 @@ class DatabaseManager:
             )
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)
+
+    def is_admin(self, uid):
+        """ Check if uer is admin """
+        self.cursor.execute(f"SELECT * from users WHERE uid={uid};")
+        resp = self.cursor.fetchall()
+        return resp[0]["is_admin"]

@@ -24,7 +24,7 @@ class TestOfficeRoutes(unittest.TestCase):
             }
             self.state_office_reg_data = {
                 "name": "Governor",
-                "type": "State",
+                "type": "State"
             }
             self.local_govt_office_reg_data = {
                 "name": "Member of county Assenbly",
@@ -44,10 +44,8 @@ class TestOfficeRoutes(unittest.TestCase):
                 "email": "ruguru@email.com", "password": "abcdefghijkl"}
             resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
             login_results = self.client().post("/api/v2/auth/login", data=json.dumps(self.test_user_login_data))
-
-
+            print(f"@@@@@@@@@@@@@@@@@ -->{login_results}")
             auth_token = json.loads(login_results.data)["message"][0]["token"]
-
             self.updated_header = {"content-type": "application/json", "Authorization": f"Bearer {auth_token}"}
 
 
