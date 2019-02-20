@@ -135,3 +135,27 @@ def vote_office():
             {"status": 401, "message": "No Token Provided"}), 401
 
     return custom_response
+
+
+@BASE_BP_V2.route("/office/<int:oid>/result", methods=["GET"])
+def vote_tally(oid):
+    """ Collate and fetch the result of specific office."""
+    custom_response = None
+    cur = DatabaseManager()
+    cur.cursor.execute(f"select * from offices where oid={oid}")
+    if cur.cursor.fetchone() is None:
+        custom_response = jsonify(
+            f"Office id {oid} does not exist in our records"), 404
+    else:
+        vote_info = cur.fetch_a_record_by_id_from_a_table(
+            "votes", "oid", oid)
+        office = cur.fetch_a_record_by_id_from_a_table(
+            "offices", "oid", vote_info[0]['oid'])[0]["type"]
+        cur.cursor.execute("SELECT COUNT(*) FROM votes where oid=3;")
+        results = cur.cursor.fetchall()
+        data = []
+        for i in vote_info:
+            data.append({"office": i[3], "candidate": i[2], "results": i[0]})
+        custom_response = jsonify({"status": 200, office: data}), 200
+
+    return custom_response
