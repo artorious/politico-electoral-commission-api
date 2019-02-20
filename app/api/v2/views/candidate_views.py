@@ -3,6 +3,7 @@
 
 from flask import Blueprint, jsonify, request
 from app.api.v2.models.candidates_models import Candidates
+from app.api.v2.models.votes_model import VoteHandler
 from app.api.v2.models.database_models import DatabaseManager
 from app.api.v2.models.validation_helper import ValidationHelper
 
@@ -57,7 +58,7 @@ def create_candidate(oid):
 
 
 @BASE_BP_V2.route("/office/open", methods=["GET"])
-def fetch_all_offices():
+def fetch_all_open_offices():
     """ Fetch all political offices (GET) """
 
     auth_header = request.headers.get('Authorization')
@@ -87,6 +88,45 @@ def fetch_all_offices():
                 custom_response = jsonify({
                     "status": 200, "Registered Candidates": data
                 }), 200
+        else:
+            custom_response = jsonify({'message': decoded_token}), 401
+
+    else:
+        custom_response = jsonify(
+            {"status": 401, "message": "No Token Provided"}), 401
+
+    return custom_response
+
+
+@BASE_BP_V2.route("/votes/", methods=["POST"])
+def vote_office():
+    """ Vote for  a political office """
+    custom_response = None
+    auth_header = request.headers.get('Authorization')
+    if auth_header is not None:
+        access_token = auth_header.split(" ")[1]
+        decoded_token = ValidationHelper.decode_token(access_token)
+
+        if not isinstance(decoded_token, str):
+            raw_vote_data = request.get_json(force=True)
+            sample_vote = VoteHandler(raw_vote_data)
+
+            if len(raw_vote_data) > 4:
+                custom_response = jsonify(
+                    sample_vote.more_data_fields_response), 400
+            elif len(raw_vote_data) < 4:
+                custom_response = jsonify(
+                    sample_vote.few_data_fields_response), 400
+            elif sample_vote.validate_vote_data() is None:
+                response = sample_vote.cast_a_vote()
+                if "duplicate_error" in response:
+                    custom_response = jsonify(response), 409
+                else:
+
+                    custom_response = jsonify(response), 201
+            else:
+                custom_response = sample_vote.validate_vote_data()
+
         else:
             custom_response = jsonify({'message': decoded_token}), 401
 
