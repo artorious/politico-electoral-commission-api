@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ Methods for querying the database """
+import os
 import sys
 import time
 import psycopg2
@@ -9,7 +10,7 @@ from flask import current_app
 
 
 class DatabaseManager:
-    """ Database Manager  """
+    """ Database Manager """
     parties_table_query = "CREATE TABLE IF NOT EXISTS parties (\
             pid SERIAL PRIMARY KEY, \
             name VARCHAR(50) UNIQUE NOT NULL,\
@@ -58,17 +59,15 @@ class DatabaseManager:
             PRIMARY KEY (oid, uid) \
             );"
 
-
-    admin_pass = '$2b$12$Eh4hu4P8pnK1rF7JmhwpdeBsJPnuowTNfOhDBEOyfHwkXNTHKF2EC'
     time_obj = time.localtime(time.time())
     default_admin = """
             INSERT INTO users (uid, firstname, lastname, othername,
             email, telephone, passport_url,registration_timestamp,
             last_login_timestamp, is_admin, password)
             VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
-                "Shirleen", "Njoki", "koki", "shirleen@admin.com",
+                "Shirleen", "Njoki", "koki", os.getenv("ADMIN_EMAIL"),
                 "0727212166", "images/koki.png", time.asctime(time_obj),
-                "Not logged in Yet", True, admin_pass)
+                "Not logged in Yet", True, os.getenv("DEFAULT_ADMIN_PASS")
 
     def __init__(self):
         """ Initaliaze a cursor connection to DB """
