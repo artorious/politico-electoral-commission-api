@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """ Data representation - Routines for user to interact with the API. """
 import time
+import json
 import psycopg2
 from flask import jsonify
 from app.api.v2.models.validation_helper import ValidationHelper
+
 
 
 class Candidates(ValidationHelper):
@@ -17,7 +19,8 @@ class Candidates(ValidationHelper):
     def create_a_candidate(self):
         """ Create/Register Candidate """
         time_obj = time.localtime(time.time())
-        custom_msg = None
+        custom_msg = json.dumps({
+            "message": "Operation failed. Candidate already registered"}), 409
         try:
             self.cursor.execute("""
             INSERT INTO candidates (\

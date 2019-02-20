@@ -48,6 +48,17 @@ class DatabaseManager:
             registration_timestamp VARCHAR(50) NOT NULL, \
             PRIMARY KEY (oid, uid) \
             );"
+    votes_table_query = "CREATE TABLE IF NOT EXISTS votes (\
+            vid SERIAL, \
+            cid INT NOT NULL,\
+            uid INT NOT NULL, \
+            oid INT NOT NULL,\
+            pid INT NOT NULL,\
+            registration_timestamp VARCHAR(50) NOT NULL, \
+            PRIMARY KEY (oid, uid) \
+            );"
+
+
     admin_pass = '$2b$12$Eh4hu4P8pnK1rF7JmhwpdeBsJPnuowTNfOhDBEOyfHwkXNTHKF2EC'
     time_obj = time.localtime(time.time())
     default_admin = """
@@ -78,6 +89,7 @@ class DatabaseManager:
         self.cursor.execute(self.offices_table_query)
         self.cursor.execute(self.users_table_query)
         self.cursor.execute(self.candidate_table_query)
+        self.cursor.execute(self.votes_table_query)
         print("Tables Created Succesfully")
 
     def fetch_all_records_in_a_table(self, table):
@@ -158,6 +170,7 @@ class DatabaseManager:
             self.cursor.execute("DROP TABLE IF EXISTS offices CASCADE")
             self.cursor.execute("DROP TABLE IF EXISTS users CASCADE")
             self.cursor.execute("DROP TABLE IF EXISTS candidates CASCADE")
+            self.cursor.execute("DROP TABLE IF EXISTS votes CASCADE")
             print("Tables Dropped Successfully")
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)

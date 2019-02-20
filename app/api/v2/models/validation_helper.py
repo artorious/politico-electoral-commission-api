@@ -95,7 +95,9 @@ class ValidationHelper(DatabaseManager):
             Check for the expected fields in user_input.
             Return True/False
         """
-        return list(raw_data.keys()) == expected_party_fields
+        payload_list = list(raw_data.keys())
+        return all(_ in expected_party_fields for _ in payload_list)
+
 
     @staticmethod
     def check_for_empty_strings_in_user_input(raw_data):
