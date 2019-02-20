@@ -67,7 +67,7 @@ class DatabaseManager:
             VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
                 "Shirleen", "Njoki", "koki", os.getenv("ADMIN_EMAIL"),
                 "0727212166", "images/koki.png", time.asctime(time_obj),
-                "Not logged in Yet", True, os.getenv("DEFAULT_ADMIN_PASS")
+                "Not logged in Yet", True, os.getenv("DEFAULT_ADMIN_PASS"))
 
     def __init__(self):
         """ Initaliaze a cursor connection to DB """
