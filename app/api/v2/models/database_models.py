@@ -58,6 +58,12 @@ class DatabaseManager:
             registration_timestamp VARCHAR(50) NOT NULL, \
             PRIMARY KEY (oid, uid) \
             );"
+    petitions_table_query = "CREATE TABLE IF NOT EXISTS petitions (\
+            petition_id SERIAL PRIMARY KEY, \
+            office INT NOT NULL,\
+            cover_letter TEXT NOT NULL, \
+            evidence TEXT \
+            );"
 
     time_obj = time.localtime(time.time())
     default_admin = """
@@ -89,6 +95,8 @@ class DatabaseManager:
         self.cursor.execute(self.users_table_query)
         self.cursor.execute(self.candidate_table_query)
         self.cursor.execute(self.votes_table_query)
+        self.cursor.execute(self.petitions_table_query)
+        self.cursor.execute(self.default_admin)
         print("Tables Created Succesfully")
 
     def fetch_all_records_in_a_table(self, table):
