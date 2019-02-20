@@ -68,6 +68,27 @@ class ValidationHelper(DatabaseManager):
         "status": 422, "error": "Empty data field"
     }
 
+    unprocessable_user_response = {
+        "status": 422,
+        "error": "Unprocessable Entity - User does not exist"
+    }
+
+    unprocessable_party_response = {
+        "status": 422,
+        "error": "Unprocessable Entity - Political party does not exist"
+    }
+
+    unprocessable_office_response = {
+        "status": 422,
+        "error": "Unprocessable Entity - Office type does not exist"
+    }
+
+    unprocessable_data_type_response = {
+        "status": 422,
+        "error": "Unprocessable Entity - Expected integers only"
+    }
+
+
     @staticmethod
     def check_for_expected_keys_in_user_input(raw_data, expected_party_fields):
         """ (dict, list) -> bool
@@ -94,6 +115,7 @@ class ValidationHelper(DatabaseManager):
         values_list = list(raw_data.values())
         return all(isinstance(item, str) for item in values_list)
 
+
     @staticmethod
     def check_valid_email_syntax(email):
         """
@@ -111,5 +133,15 @@ class ValidationHelper(DatabaseManager):
             return payload['sub']
         except jwt.ExpiredSignatureError:
             return "Expired has token. Please login to get a new token"
-        except jwt.InvalidTokenError as err:
+        except jwt.InvalidTokenError:
             return "Invalid token detected. Please register or login"
+
+    @staticmethod
+    def check_list_contains_only_integers(the_list):
+        """ Return true if all items are integers"""
+        return all(isinstance(item, int) for item in the_list)
+
+    @staticmethod
+    def check_list_contains_only_positive_integers(the_list):
+        """ Return true if all items are integers"""
+        return all(item > 0 for item in the_list)
