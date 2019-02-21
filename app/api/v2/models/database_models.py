@@ -62,7 +62,8 @@ class DatabaseManager:
             petition_id SERIAL PRIMARY KEY, \
             office INT NOT NULL,\
             cover_letter TEXT NOT NULL, \
-            evidence TEXT \
+            evidence TEXT, \
+            registration_timestamp VARCHAR(50) NOT NULL\
             );"
 
     time_obj = time.localtime(time.time())
