@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ Routes Candidate Information """
-
+import time
+import psycopg2
 from flask import Blueprint, jsonify, request
 from app.api.v2.models.candidates_models import Candidates
 from app.api.v2.models.votes_model import VoteHandler
@@ -151,7 +152,8 @@ def vote_tally(oid):
             "votes", "oid", oid)
         office = cur.fetch_a_record_by_id_from_a_table(
             "offices", "oid", vote_info[0]['oid'])[0]["type"]
-        cur.cursor.execute("SELECT COUNT(*) FROM votes where oid=3;")
+        #cur.cursor.execute("SELECT COUNT(*) FROM votes where oid=3;")
+        cur.cursor.execute(f"SELECT COUNT(*) FROM votes where oid={oid};")
         results = cur.cursor.fetchall()
         data = []
         for i in vote_info:
@@ -159,3 +161,73 @@ def vote_tally(oid):
         custom_response = jsonify({"status": 200, office: data}), 200
 
     return custom_response
+
+
+@BASE_BP_V2.route("/petitions", methods=["POST"])
+def make_petition():
+    """ Petition to challenge an election """
+    custom_response = None
+    auth_header = request.headers.get('Authorization')
+
+    if auth_header is not None:
+        access_token = auth_header.split(" ")[1]
+        decoded_token = ValidationHelper.decode_token(access_token)
+
+        if not isinstance(decoded_token, str):
+            if DatabaseManager().is_admin(decoded_token) is True:
+
+                petition_data = request.get_json()
+                if petition_data is None:
+                    custom_response = jsonify(
+                        'Unsupported Media-Type. Expected json'), 415
+                else:
+                    if len(petition_data) > 3:
+                        custom_response = jsonify(
+                            ValidationHelper.more_data_fields_response), 400
+
+                    elif len(petition_data) < 3:
+                        custom_response = jsonify(
+                            ValidationHelper.few_data_fields_response), 400
+                    else:
+                        office = petition_data['office']
+                        letter = petition_data["cover_letter"]
+                        evidence = ['evidence']
+                        cur = DatabaseManager()
+                        time_obj = time.localtime(time.time())
+                        cur.cursor.execute("""
+                            INSERT INTO petitions (
+                            petition_id, office, cover_letter, evidence, registration_timestamp)
+                            VALUES (DEFAULT, %s, %s, %s, %s) RETURNING petition_id, office, cover_letter, evidence, registration_timestamp;""", (
+                                office, letter, evidence, time.asctime(time_obj)
+                            ))
+
+                        response = cur.cursor.fetchall()
+                        print(response)
+                        petition = {}
+                        petition["petition_id"] = response[0]["petition_id"]
+                        petition["office"] = response[0]["office"]
+                        petition["cover_letter"] = response[0]["cover_letter"]
+                        petition["evidence"] = response[0]["evidence"]
+                        petition["registration_timestamp"] = \
+                            response[0]["registration_timestamp"]
+
+                        custom_response =jsonify({"status": 201, "petition": petition})
+
+            else:
+                custom_response = jsonify({
+                    "user": decoded_token,
+                    'message': "Restricted Access. Admin only"}), 401
+
+        else:
+            custom_response = jsonify({
+                "user": decoded_token,
+                'message': "Invalid Token"}), 401
+
+    else:
+        custom_response = jsonify(
+            {"status": 401, "message": "No Token Provided"}), 401
+
+    return custom_response
+
+
+

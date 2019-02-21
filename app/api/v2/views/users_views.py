@@ -69,3 +69,41 @@ def login():
             "error": "Invalid email or password, Please try again"}), 401
 
     return custom_response
+
+
+
+@AUTH_BP_V2.route("/reset", methods=["POST"])
+def reset_password():
+    """ Change email setings """
+    custom_response = None
+    user_login_data = request.get_json(force=True)
+
+    if len(user_login_data) > 3:
+        custom_response = jsonify(
+            ValidationHelper.more_data_fields_response), 400
+
+    elif len(user_login_data) < 3:
+        custom_response = jsonify(
+            ValidationHelper.few_data_fields_response), 400
+
+    elif ValidationHelper().check_for_expected_keys_in_user_input(
+            user_login_data, ["email", "password", "new_email"]) is False:
+        custom_response = jsonify(
+            ValidationHelper.unexpected_data_types_resp), 400
+    raw_email = user_login_data["email"]
+    raw_password = user_login_data["password"]
+    new_email = user_login_data["new_email"]
+
+    # if DatabaseManager().lookup_whether_entity_exists_in_a_table_by_attrib(
+            # "users", "email", new_email)
+    custom_response = jsonify({
+        "status": 200,
+        "Account settings": [{
+            "message": 'Email updated. Check it for a password reset link',
+            "user": new_email}]}), 200
+    # else:
+        # custom_response = jsonify({
+            # "status": 401,
+            # "error": "Invalid email, Please try a differnt email"}), 401
+
+    return custom_response

@@ -7,7 +7,6 @@ from flask import jsonify
 from app.api.v2.models.validation_helper import ValidationHelper
 
 
-
 class Candidates(ValidationHelper):
     """ Candidate methods"""
     def __init__(self, office_id, candidate_reg_data):
@@ -33,10 +32,10 @@ class Candidates(ValidationHelper):
             ))
             last_id = self.cursor.fetchall()
 
-            custom_msg = {"status": 201, "candidate": [{
+            custom_msg = jsonify( {"status": 201, "candidate": [{
                 "id": last_id[0]["cid"],
                 "user": self.candidate_reg_data["user_id"]
-            }]}
+            }]})
 
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)
@@ -76,6 +75,29 @@ class Candidates(ValidationHelper):
         ) is False:
             custom_response = jsonify(self.unprocessable_user_response), 422
 
-
-
         return custom_response
+
+
+
+def create_a_petition(self, office, cover_letter, evidence):
+        """ Create/Register a petition """
+        time_obj = time.localtime(time.time())
+        try:
+            self.cursor.execute("""
+            INSERT INTO petitions (
+            petition_id, office, cover_letter, evidence,
+            registration_timestamp)
+            VALUES (DEFAULT, %s, %s, %s, %s)
+            RETURNING petition_id, office, cover_letter,
+            evidence, registration_timestamp;""", (
+                office, cover_letter,
+                evidence, time.asctime(time_obj)
+            ))
+            new_petition = self.cursor.fetchall()
+            custom_msg = new_petition
+
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+
+        finally:
+            return custom_msg
