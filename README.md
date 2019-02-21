@@ -20,6 +20,14 @@ A web application platform which both the politicians and citizens can use. Poli
 `/app/api/v1/offices` | `POST`| Create Political office
 `/api/v2/offices` | `GET` | Fetch all political offices
 `/api/v2/offices/<int:id>` | `GET` | Fetch a specific offices
+`/api/v2/auth/signup`|`POST`| User signup
+`/api/v2/auth/login`|`POST`| User Login with Auth
+`/api/v2/office/<int:id/register`|`POST`| Candidate registration
+`/api/v2/office/open` | `GET` | List all open positions
+`/api/v2/votes/` | `POST` | vote for a candidate
+`/api/v2/office/<int:id>/result` | `GET` | Collate and display resuls
+`/api/v2/petitions` | `POST` | Make a petition to challenge election results
+`/api/v2/auth/reset`| `POST` | Make a request for a password change
 
 ## Usage
 * Read and interact with the [API Documentation](https://documenter.getpostman.com/view/3796196/RztspSTt)
