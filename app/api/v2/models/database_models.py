@@ -96,7 +96,6 @@ class DatabaseManager:
         self.cursor.execute(self.candidate_table_query)
         self.cursor.execute(self.votes_table_query)
         self.cursor.execute(self.petitions_table_query)
-        self.cursor.execute(self.default_admin)
         print("Tables Created Succesfully")
 
     def fetch_all_records_in_a_table(self, table):
