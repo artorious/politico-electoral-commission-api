@@ -152,7 +152,8 @@ def vote_tally(oid):
             "votes", "oid", oid)
         office = cur.fetch_a_record_by_id_from_a_table(
             "offices", "oid", vote_info[0]['oid'])[0]["type"]
-        cur.cursor.execute("SELECT COUNT(*) FROM votes where oid=3;")
+        #cur.cursor.execute("SELECT COUNT(*) FROM votes where oid=3;")
+        cur.cursor.execute(f"SELECT COUNT(*) FROM votes where oid={oid};")
         results = cur.cursor.fetchall()
         data = []
         for i in vote_info:
