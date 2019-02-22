@@ -90,11 +90,13 @@ def create_a_petition(self, office, cover_letter, evidence):
             VALUES (DEFAULT, %s, %s, %s, %s)
             RETURNING petition_id, office, cover_letter,
             evidence, registration_timestamp;""", (
+
                 office, cover_letter,
                 evidence, time.asctime(time_obj)
             ))
             new_petition = self.cursor.fetchall()
             custom_msg = new_petition
+
 
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)
