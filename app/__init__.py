@@ -69,7 +69,7 @@ def create_app(config_mode):
     @app.route("/")
     def home():
         """ Home - Docs"""
-        return redirect("https://documenter.getpostman.com/view/3796196/RztoKnTh#8203e67f-3ebe-4409-8e1b-85b0554d4773", code=302)
+        return redirect("https://documenter.getpostman.com/view/3796196/RztspSTt", code=302)
 
     return app
 
