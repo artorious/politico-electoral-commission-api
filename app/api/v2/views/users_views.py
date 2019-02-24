@@ -66,7 +66,7 @@ def login():
     else:
         custom_response = jsonify({
             "status": 401,
-            "error": "Invalid email or password, Please try again"}), 401
+            "error": "Invalid email, Please sign up"}), 401
 
     return custom_response
 

@@ -519,7 +519,7 @@ class TestUserLogin(TestUserRoutes):
             msg="Should be 401")
         self.assertEqual(
             deserialized_response["error"],
-            "Invalid email or password, Please try again")
+            "Invalid email, Please sign up")
 
 
 if __name__ == "__main__":
