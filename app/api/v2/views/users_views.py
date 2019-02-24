@@ -15,11 +15,9 @@ def create_user():
     user_reg_data = request.get_json(force=True)
     sample_user = Users(user_reg_data)
 
-    if len(user_reg_data) > 8:
-        custom_response = jsonify(sample_user.more_data_fields_response), 400
-
-    elif len(user_reg_data) < 8:
-        custom_response = jsonify(sample_user.few_data_fields_response), 400
+    if len(user_reg_data) != 8:
+        custom_response = jsonify(
+            sample_user.invalid_signup_data_fields_response), 400
 
     elif sample_user.validate_user_reg_data() is None:
         custom_response = jsonify(sample_user.create_user_account()), 201
@@ -54,9 +52,9 @@ def login():
         lookup_whether_entity_exists_in_a_table_by_attrib(
             "users", "email", raw_email) and DatabaseManager().\
             verify_user_password(raw_password, raw_email):
-        uid = DatabaseManager().fetch_entity_id(
-            "uid", "users", "email", raw_email)
-        auth_token = Users.generate_token(uid)
+        user_id = DatabaseManager().fetch_entity_id(
+            "user_id", "users", "email", raw_email)
+        auth_token = Users.generate_token(user_id)
         DatabaseManager().update_login_timestamp(raw_email)
         custom_response = jsonify({
             "status": 200,
@@ -69,7 +67,6 @@ def login():
             "error": "Invalid email or password, Please try again"}), 401
 
     return custom_response
-
 
 
 @AUTH_BP_V2.route("/reset", methods=["POST"])
@@ -94,16 +91,10 @@ def reset_password():
     raw_password = user_login_data["password"]
     new_email = user_login_data["new_email"]
 
-    # if DatabaseManager().lookup_whether_entity_exists_in_a_table_by_attrib(
-            # "users", "email", new_email)
     custom_response = jsonify({
         "status": 200,
         "Account settings": [{
             "message": 'Email updated. Check it for a password reset link',
             "user": new_email}]}), 200
-    # else:
-        # custom_response = jsonify({
-            # "status": 401,
-            # "error": "Invalid email, Please try a differnt email"}), 401
 
     return custom_response

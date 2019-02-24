@@ -25,13 +25,14 @@ class Users(ValidationHelper):
                 "first_name", "last_name", "other_name", "email", "telephone",
                 "passport_url", "password", "confirm_password"]
         ) is False:
-            custom_response = jsonify(self.unprocessable_data_response), 422
+            custom_response = jsonify(
+                self.unknown_signup_data_field_response), 422
 
         elif self.check_for_expected_value_types_in_user_input(
                 self.user_reg_data) is False:
             custom_response = jsonify(self.unexpected_data_types_resp), 422
 
-        elif len(self.raw_password.strip()) < 7:
+        elif len(self.raw_password.strip()) < 6:
             custom_response = jsonify(self.invalid_password_length_resp), 422
 
         elif self.user_reg_data["password"] != \
@@ -74,14 +75,14 @@ class Users(ValidationHelper):
         custom_msg = None
         try:
             self.cursor.execute("""
-            INSERT INTO users (uid, firstname, lastname, othername,
+            INSERT INTO users (user_id, firstname, lastname, othername,
             email, telephone, passport_url,registration_timestamp,
             last_login_timestamp, is_admin, password)
             VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING uid;""", (
-                self.user_reg_data["first_name"],
-                self.user_reg_data["last_name"],
-                self.user_reg_data["other_name"],
+            RETURNING user_id;""", (
+                self.user_reg_data["first_name"].title(),
+                self.user_reg_data["last_name"].title(),
+                self.user_reg_data["other_name"].title(),
                 self.user_reg_data["email"],
                 self.user_reg_data["telephone"],
                 self.user_reg_data["passport_url"],
@@ -92,11 +93,11 @@ class Users(ValidationHelper):
             ))
 
             last_id = self.cursor.fetchall()
-            uid = last_id[0]["uid"]
-            auth_token_byte_str = self.generate_token(uid)
+            user_id = last_id[0]["user_id"]
+            auth_token_byte_str = self.generate_token(user_id)
             custom_msg = {"status": 201, "user": [{
                 "login email": self.user_reg_data["email"],
-                "Message": "Registration successful please login"
+                "message": "Registration successful please login"
             }]}
 
         except psycopg2.DatabaseError as err:
@@ -106,11 +107,11 @@ class Users(ValidationHelper):
             return custom_msg
 
     @staticmethod
-    def generate_token(uid):
+    def generate_token(user_id):
         """ Generates and returns the access token byte string """
         try:
             payload = {
-                'sub': uid,
+                'sub': user_id,
                 'exp': datetime.utcnow() + timedelta(hours=24),
                 'iat': datetime.utcnow()
             }
