@@ -11,24 +11,8 @@ from flask import current_app
 
 class DatabaseManager:
     """ Database Manager """
-    parties_table_query = "CREATE TABLE IF NOT EXISTS parties (\
-            pid SERIAL PRIMARY KEY, \
-            name VARCHAR(50) UNIQUE NOT NULL,\
-            hq_address VARCHAR(50) UNIQUE NOT NULL, \
-            logo_url TEXT UNIQUE NOT NULL, \
-            registration_timestamp VARCHAR(50) NOT NULL \
-            );"
-
-    offices_table_query = "CREATE TABLE IF NOT EXISTS offices (\
-            oid SERIAL PRIMARY KEY, \
-            name VARCHAR(50) UNIQUE NOT NULL,\
-            type VARCHAR(50) NOT NULL CHECK (type IN \
-            ('Federal', 'Legislative', 'State', 'Local Government')), \
-            registration_timestamp VARCHAR(50) NOT NULL \
-            );"
-
     users_table_query = "CREATE TABLE IF NOT EXISTS users (\
-            uid SERIAL PRIMARY KEY, \
+            user_id SERIAL PRIMARY KEY , \
             firstname VARCHAR(50) NOT NULL, \
             lastname VARCHAR(50) NOT NULL, \
             othername VARCHAR(50) NOT NULL, \
@@ -41,40 +25,49 @@ class DatabaseManager:
             password VARCHAR NOT NULL \
             );"
 
-    candidate_table_query = "CREATE TABLE IF NOT EXISTS candidates (\
-            cid SERIAL, \
-            oid INT NOT NULL,\
-            uid INT NOT NULL,\
-            pid INT NOT NULL, \
-            registration_timestamp VARCHAR(50) NOT NULL, \
-            PRIMARY KEY (oid, uid) \
-            );"
-    votes_table_query = "CREATE TABLE IF NOT EXISTS votes (\
-            vid SERIAL, \
-            cid INT NOT NULL,\
-            uid INT NOT NULL, \
-            oid INT NOT NULL,\
-            pid INT NOT NULL,\
-            registration_timestamp VARCHAR(50) NOT NULL, \
-            PRIMARY KEY (oid, uid) \
-            );"
-    petitions_table_query = "CREATE TABLE IF NOT EXISTS petitions (\
-            petition_id SERIAL PRIMARY KEY, \
-            office INT NOT NULL,\
-            cover_letter TEXT NOT NULL, \
-            evidence TEXT, \
-            registration_timestamp VARCHAR(50) NOT NULL\
+    parties_table_query = "CREATE TABLE IF NOT EXISTS parties (\
+            party_id SERIAL PRIMARY KEY, \
+            name VARCHAR(50) UNIQUE NOT NULL,\
+            hq_address VARCHAR(50) UNIQUE NOT NULL, \
+            logo_url TEXT UNIQUE NOT NULL, \
+            registered_by INT NOT NULL, \
+            registration_timestamp VARCHAR(50) NOT NULL \
             );"
 
-    time_obj = time.localtime(time.time())
-    default_admin = """
-            INSERT INTO users (uid, firstname, lastname, othername,
-            email, telephone, passport_url,registration_timestamp,
-            last_login_timestamp, is_admin, password)
-            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
-                "Shirleen", "Njoki", "koki", os.getenv("ADMIN_EMAIL"),
-                "0727212166", "images/koki.png", time.asctime(time_obj),
-                "Not logged in Yet", True, os.getenv("DEFAULT_ADMIN_PASS"))
+    offices_table_query = "CREATE TABLE IF NOT EXISTS offices (\
+            office_id SERIAL PRIMARY KEY, \
+            name VARCHAR(50) UNIQUE NOT NULL,\
+            type VARCHAR(50) NOT NULL CHECK (type IN \
+            ('Federal', 'Legislative', 'State', 'Local Government')), \
+            registration_timestamp VARCHAR(50) NOT NULL \
+            );"
+
+    candidate_table_query = "CREATE TABLE IF NOT EXISTS candidates (\
+        candidate_id SERIAL, \
+        office_id INT NOT NULL REFERENCES offices(office_id) ON DELETE CASCADE,\
+        user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,\
+        party_id INT NOT NULL REFERENCES parties(party_id) ON DELETE CASCADE, \
+        registration_timestamp VARCHAR(50) NOT NULL, \
+        PRIMARY KEY (candidate_id, office_id, user_id) \
+        );"
+
+    votes_table_query = "CREATE TABLE IF NOT EXISTS votes (\
+        vote_id SERIAL, \
+        candidate_id INT NOT NULL,\
+        user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE, \
+        office_id INT NOT NULL REFERENCES offices(office_id) ON DELETE CASCADE,\
+        party_id INT NOT NULL REFERENCES parties(party_id) ON DELETE CASCADE,\
+        registration_timestamp VARCHAR(50) NOT NULL, \
+        PRIMARY KEY (candidate_id, vote_id, office_id, user_id) \
+        );"
+
+    petitions_table_query = "CREATE TABLE IF NOT EXISTS petitions (\
+        petition_id SERIAL PRIMARY KEY, \
+        office_id INT NOT NULL REFERENCES offices(office_id) ON DELETE CASCADE,\
+        cover_letter TEXT NOT NULL, \
+        evidence TEXT, \
+        registration_timestamp VARCHAR(50) NOT NULL\
+        );"
 
     def __init__(self):
         """ Initaliaze a cursor connection to DB """
@@ -91,12 +84,22 @@ class DatabaseManager:
 
     def create_all_tables(self):
         """ Create all Tables """
+        self.cursor.execute(self.users_table_query)
         self.cursor.execute(self.parties_table_query)
         self.cursor.execute(self.offices_table_query)
-        self.cursor.execute(self.users_table_query)
         self.cursor.execute(self.candidate_table_query)
         self.cursor.execute(self.votes_table_query)
         self.cursor.execute(self.petitions_table_query)
+        time_obj = time.localtime(time.time())
+        self.cursor.execute("""
+            INSERT INTO users (user_id, firstname, lastname, othername,
+            email, telephone, passport_url,registration_timestamp,
+            last_login_timestamp, is_admin, password)
+            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (email) DO NOTHING;""", (
+                "Arthur", "Ngondo", "ngondez", os.getenv("ADMIN_EMAIL"),
+                "0727212166", "images/arthr.png", time.asctime(time_obj),
+                "Not logged in Yet", True, os.getenv("DEFAULT_ADMIN_PASS")))
         print("Tables Created Succesfully")
 
     def fetch_all_records_in_a_table(self, table):
@@ -111,7 +114,7 @@ class DatabaseManager:
             return custom_msg
 
     def fetch_a_record_by_id_from_a_table(self, table, entity_id, id_value):
-        """ Fetch a single record from DB """
+        """ Fetch a single record from DB by id """
         custom_msg = None
         try:
             self.cursor.execute(
@@ -148,11 +151,11 @@ class DatabaseManager:
         try:
             self.cursor.execute(
                 f"update {table} set name = '{new_data['name']}' " +
-                f"where pid={entity_id} returning pid, name;"
+                f"where party_id={entity_id} returning party_id, name;"
             )
             response = self.cursor.fetchall()
             custom_msg = {
-                "Party Id": response[0]["pid"],
+                "Party Id": response[0]["party_id"],
                 "New Party Name": response[0]["name"]}
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)
@@ -163,7 +166,8 @@ class DatabaseManager:
         """ Delete a database record from <table> in Database """
         custom_msg = None
         try:
-            self.cursor.execute(f"delete from {table} where pid={entity_id};")
+            self.cursor.execute(
+                f"delete from {table} where party_id={entity_id};")
             custom_msg = f"Party No. {entity_id} deleted succesfully"
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)
@@ -178,6 +182,7 @@ class DatabaseManager:
             self.cursor.execute("DROP TABLE IF EXISTS users CASCADE")
             self.cursor.execute("DROP TABLE IF EXISTS candidates CASCADE")
             self.cursor.execute("DROP TABLE IF EXISTS votes CASCADE")
+            self.cursor.execute("DROP TABLE IF EXISTS petitions CASCADE")
             print("Tables Dropped Successfully")
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)
@@ -230,14 +235,15 @@ class DatabaseManager:
         time_obj = time.localtime(time.time())
         try:
             self.cursor.execute(
-                f"update users set last_login_timestamp = '{time.asctime(time_obj)}' " +
+                f"update users set last_login_timestamp = " +
+                f"'{time.asctime(time_obj)}' " +
                 f"where email='{email}';"
             )
         except psycopg2.DatabaseError as err:
             self.db_error_handler(err)
 
-    def is_admin(self, uid):
+    def is_admin(self, user_id):
         """ Check if uer is admin """
-        self.cursor.execute(f"SELECT * from users WHERE uid={uid};")
+        self.cursor.execute(f"SELECT * from users WHERE user_id={user_id};")
         resp = self.cursor.fetchall()
         return resp[0]["is_admin"]

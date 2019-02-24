@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ Test Cases for office Views/Routes """
+import os
 import unittest
 import json
 from app import create_app
@@ -30,20 +31,30 @@ class TestOfficeRoutes(unittest.TestCase):
                 "name": "Member of county Assenbly",
                 "type": "Local Government"
             }
-            self.test_user_signup_data = {
-                "first_name": "Florence",
-                "last_name": "Ruguru",
-                "other_name": "flojo",
-                "email": "ruguru@email.com",
-                "telephone": "+25418980",
-                "passport_url": "images/flo.jpg",
-                "password": "abcdefghijkl",
-                "confirm_password": "abcdefghijkl"
-            }
-            self.test_user_login_data = {
-                "email": "ruguru@email.com", "password": "abcdefghijkl"}
-            resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
-            login_results = self.client().post("/api/v2/auth/login", data=json.dumps(self.test_user_login_data))
+            # self.test_user_signup_data = {
+                # "first_name": "Florence",
+                # "last_name": "Ruguru",
+                # "other_name": "flojo",
+                # "email": "ruguru@email.com",
+                # "telephone": "+25418980",
+                # "passport_url": "images/flo.jpg",
+                # "password": "abcdefghijkl",
+                # "confirm_password": "abcdefghijkl"
+            # }
+            # self.test_user_login_data = {
+                # "email": "ruguru@email.com", "password": "abcdefghijkl"}
+            # resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
+
+            # login_results = self.client().post("/api/v2/auth/login", data=json.dumps(self.test_user_login_data))
+
+            # auth_token = json.loads(login_results.data)["message"][0]["token"]
+            # self.updated_header = {"content-type": "application/json", "Authorization": f"Bearer {auth_token}"}
+
+            # resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
+
+            self.admin_login_data = {
+                "email": os.getenv("ADMIN_EMAIL"), "password": os.getenv("DEFAULT_RAW_ADMIN_PASS")}
+            login_results = self.client().post("/api/v2/auth/login", data=json.dumps(self.admin_login_data))
             auth_token = json.loads(login_results.data)["message"][0]["token"]
             self.updated_header = {"content-type": "application/json", "Authorization": f"Bearer {auth_token}"}
 
@@ -74,7 +85,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
 
 
-    def test_ofice_creation_with_more_fields_than_is_expected(self):
+    def test_office_creation_with_more_fields_than_is_expected(self):
         """ Test with more fields than expected. """
         test_extra_data = {
             "name": "Member of Congress",
@@ -94,7 +105,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Bad Query - More data fields than expected",
+            "Invalid user input data (Office creation data fields). Expected fields for 'name' and 'type'. Please try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -114,7 +125,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Bad Query - Fewer data fields than expected",
+            "Invalid user input data (Office creation data fields). Expected fields for 'name' and 'type'. Please try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -126,7 +137,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         }
         empty_local_govt_data = {
             "name": "Member of county Assenbly",
-            "type": "\t      \n",
+                   "type": "\t      \n",
         }
 
         response = self.client().post(
@@ -141,7 +152,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Empty data field",
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -157,7 +168,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Empty data field",
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -181,7 +192,7 @@ class TestOfficeCreation(TestOfficeRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Entity already exists",
+            "Office registration conflict - Office name provided is already registered",
             msg="Response Body Contents- Should be custom message "
         )
 
