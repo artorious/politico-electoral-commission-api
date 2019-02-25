@@ -99,7 +99,7 @@ class DatabaseManager:
             email, telephone, passport_url,registration_timestamp,
             last_login_timestamp, is_admin, password)
             VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT(email) DO NOTHING;""", (
+            ON CONFLICT ON CONSTRAINT users_email_key DO NOTHING;""", (
                 "Arthur", "Ngondo", "ngondez", os.getenv("ADMIN_EMAIL"),
                 "0727212166", "images/arthr.png", time.asctime(time_obj),
                 "Not logged in Yet", True, os.getenv("DEFAULT_ADMIN_PASS")))
