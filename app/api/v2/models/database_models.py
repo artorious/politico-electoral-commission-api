@@ -92,7 +92,11 @@ class DatabaseManager:
         self.cursor.execute(self.petitions_table_query)
         time_obj = time.localtime(time.time())
         self.cursor.execute("""
-            INSERT INTO users (user_id, firstname, lastname, othername, email, telephone, passport_url,registration_timestamp, last_login_timestamp, is_admin, password) VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
+            INSERT INTO users (user_id, firstname, lastname, othername,
+            email, telephone, passport_url,registration_timestamp,
+            last_login_timestamp, is_admin, password)
+            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (email) DO NOTHING;""", (
                 "Arthur", "Ngondo", "ngondez", os.getenv("ADMIN_EMAIL"),
                 "0727212166", "images/arthr.png", time.asctime(time_obj),
                 "Not logged in Yet", True, os.getenv("DEFAULT_ADMIN_PASS")))

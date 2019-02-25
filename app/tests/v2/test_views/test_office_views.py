@@ -31,26 +31,7 @@ class TestOfficeRoutes(unittest.TestCase):
                 "name": "Member of county Assenbly",
                 "type": "Local Government"
             }
-            # self.test_user_signup_data = {
-                # "first_name": "Florence",
-                # "last_name": "Ruguru",
-                # "other_name": "flojo",
-                # "email": "ruguru@email.com",
-                # "telephone": "+25418980",
-                # "passport_url": "images/flo.jpg",
-                # "password": "abcdefghijkl",
-                # "confirm_password": "abcdefghijkl"
-            # }
-            # self.test_user_login_data = {
-                # "email": "ruguru@email.com", "password": "abcdefghijkl"}
-            # resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
 
-            # login_results = self.client().post("/api/v2/auth/login", data=json.dumps(self.test_user_login_data))
-
-            # auth_token = json.loads(login_results.data)["message"][0]["token"]
-            # self.updated_header = {"content-type": "application/json", "Authorization": f"Bearer {auth_token}"}
-
-            # resp = self.client().post("/api/v2/auth/signup", data=json.dumps(self.test_user_signup_data))
 
             self.admin_login_data = {
                 "email": os.getenv("ADMIN_EMAIL"), "password": os.getenv("DEFAULT_RAW_ADMIN_PASS")}
