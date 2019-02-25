@@ -8,7 +8,8 @@ install:
     - pip3 install -r requirements.txt
 
 env:
-    - SECRET="\xe5\x9c\xd2B\xa8+O>\x84\xeb\xa0\xbcsA'\xf9\xa1L\x83\x1b\xfc\x14!\xac" DATABASE_URL="dbname='politico_db' user='postgres' password='postgres' host='localhost' port=5432" TEST_DATABASE_URL="dbname='politico_test_db' user='postgres' password='postgres' host='localhost' port=5432"
+    - SECRET="\xe5\x9c\xd2B\xa8+O>\x84\xeb\xa0\xbcsA'\xf9\xa1L\x83\x1b\xfc\x14!\xac" DATABASE_URL="dbname='politico_db' user='postgres' password='postgres' host='localhost' port=5432" TEST_DATABASE_URL="dbname='politico_test_db' user='postgres' password='postgres' host='localhost' port=5432" ADMIN_EMAIL="arthur@admin.com" DEFAULT_ADMIN_PASS='$2b$12$Eh4hu4P8pnK1rF7JmhwpdeBsJPnuowTNfOhDBEOyfHwkXNTHKF2EC' DEFAULT_RAW_ADMIN_PASS='iambaboon'
+
 
 services:
     - postgresql

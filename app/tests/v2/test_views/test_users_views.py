@@ -46,11 +46,12 @@ class TestUserCreation(TestUserRoutes):
         )
         deserialized_response = json.loads(response.data.decode())
         self.assertIn("user", deserialized_response)
-        self.assertIn("Message", deserialized_response["user"][0])
+        self.assertIn("message", deserialized_response["user"][0])
         self.assertEqual(
             response.status_code, 201,
             msg="response code SHOULD BE 201 (created)"
         )
+
 
     def test_user_signup_with_empty_strings(self):
         """ Test with an empty string in field - unprocessable"""
@@ -107,7 +108,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Empty data field",
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -123,7 +124,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Empty data field",
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -139,7 +140,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Empty data field",
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -155,7 +156,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Empty data field",
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -182,7 +183,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Bad Query - Fewer data fields than expected",
+            "Invalid user input data (Signup data fields). Expected fields for 'first_name', 'last_name', 'other_name', 'email', 'telephone', 'passport_url', 'password' and 'confirm_password'. Please try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -212,7 +213,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Bad Query - More data fields than expected",
+            "Invalid user input data (Signup data fields). Expected fields for 'first_name', 'last_name', 'other_name', 'email', 'telephone', 'passport_url', 'password' and 'confirm_password'. Please try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -252,7 +253,7 @@ class TestUserCreation(TestUserRoutes):
         self.assertIn("error", deserialized_response)
         self.assertEqual(
             deserialized_response["error"],
-            "Invalid Email Syntax",
+            "Invalid Email Syntax. Please correct email syntax and try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -268,7 +269,7 @@ class TestUserCreation(TestUserRoutes):
         self.assertIn("error", deserialized_response)
         self.assertEqual(
             deserialized_response["error"],
-            "Invalid Email Syntax",
+            "Invalid Email Syntax. Please correct email syntax and try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -281,8 +282,8 @@ class TestUserCreation(TestUserRoutes):
                 "email": "cole@email.com",
                 "telephone": "+254727161278",
                 "passport_url": "images/cole.jpg",
-                "password": "passwd",
-                "confirm_password": "passwd"
+                "password": "passw",
+                "confirm_password": "passw"
             }
         sample_user1 = {
                 "first_name": "Joey",
@@ -306,7 +307,7 @@ class TestUserCreation(TestUserRoutes):
         self.assertIn("error", deserialized_response)
         self.assertEqual(
             deserialized_response["error"],
-            "Invalid Password Length. 6 Characters minimum",
+            "Invalid Password Length. 6 Characters minimum. Please adjust and try again",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -322,7 +323,7 @@ class TestUserCreation(TestUserRoutes):
         self.assertIn("error", deserialized_response)
         self.assertEqual(
             deserialized_response["error"],
-            "Invalid Password Length. 6 Characters minimum",
+            "Invalid Password Length. 6 Characters minimum. Please adjust and try again",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -392,7 +393,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Email already in use",
+            "Signup conflict - Email provided is already registered with another account",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -433,7 +434,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Passport photo already in use",
+            "Signup conflict - Passport photo URL provided is already in use by another account",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -474,7 +475,7 @@ class TestUserCreation(TestUserRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Phone number already registered",
+            "Signup conflict - Telephone number provided is already in use by another account",
             msg="Response Body Contents- Should be custom message "
         )
 
