@@ -8,8 +8,9 @@ from app.api.v2.models.validation_helper import ValidationHelper
 
 class PoliticalParties(ValidationHelper):
     """ Parties methods"""
-    def __init__(self, party_reg_data):
+    def __init__(self, party_reg_data, user_id):
         self.party_reg_data = party_reg_data
+        self.creators_user_id = user_id
         super().__init__()
 
     def create_party(self):
@@ -19,17 +20,19 @@ class PoliticalParties(ValidationHelper):
         try:
             self.cursor.execute("""
             INSERT INTO parties (\
-            pid, name, hq_address, logo_url, registration_timestamp)
-            VALUES (DEFAULT, %s, %s, %s, %s) RETURNING pid;""", (
-                self.party_reg_data["name"],
-                self.party_reg_data["hq_address"],
+            party_id, name, hq_address, logo_url,
+            registered_by, registration_timestamp)
+            VALUES (DEFAULT, %s, %s, %s, %s, %s) RETURNING party_id;""", (
+                self.party_reg_data["name"].title(),
+                self.party_reg_data["hq_address"].title(),
                 self.party_reg_data["logo_url"],
+                self.creators_user_id,
                 time.asctime(time_obj)
             ))
             last_id = self.cursor.fetchall()
 
             custom_msg = {"status": 201, "party": [{
-                "id": last_id[0]["pid"],
+                "id": last_id[0]["party_id"],
                 "name": self.party_reg_data["name"]
             }]}
 
@@ -45,21 +48,31 @@ class PoliticalParties(ValidationHelper):
         if self.check_for_expected_keys_in_user_input(
                 self.party_reg_data, ["name", "hq_address", "logo_url"]
         ) is False:
-            custom_response = jsonify(self.unprocessable_data_response), 422
+            custom_response = jsonify(
+                self.unknown_party_creation_data_field_response), 422
+
         elif self.check_for_expected_value_types_in_user_input(
                 self.party_reg_data) is False:
-            custom_response = jsonify(self.unprocessable_data_response), 422
+            custom_response = jsonify(self.unexpected_data_types_resp), 422
+
         elif self.check_for_empty_strings_in_user_input(
                 self.party_reg_data) is True:
             custom_response = jsonify(self.empty_data_field_response), 422
+
         elif self.lookup_whether_entity_exists_in_a_table_by_attrib(
                 "parties", "name", self.party_reg_data["name"]) is True:
-            custom_response = jsonify(self.party_already_exists_response), 409
+            custom_response = jsonify(
+                self.party_name_already_exists_response), 409
+
         elif self.lookup_whether_entity_exists_in_a_table_by_attrib(
                 "parties", "hq_address", self.party_reg_data["hq_address"]
         ) is True:
-            custom_response = jsonify(self.hq_already_exists_response), 409
+            custom_response = jsonify(
+                self.party_hq_already_exists_response), 409
+
         elif self.lookup_whether_entity_exists_in_a_table_by_attrib(
                 "parties", "logo_url", self.party_reg_data["logo_url"]) is True:
-            custom_response = jsonify(self.logo_already_exists_response), 409
+            custom_response = jsonify(
+                self.party_logo_already_exists_response), 409
+
         return custom_response

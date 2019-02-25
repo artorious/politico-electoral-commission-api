@@ -30,7 +30,7 @@ def fetch_all_offices():
                 data = []
                 for record in raw_offices:
                     sample = {}
-                    sample["Office ID"] = record["oid"]
+                    sample["Office ID"] = record["office_id"]
                     sample["Office Name"] = record["name"]
                     sample["Office Type"] = record["type"]
                     sample["Registration Timestamp"] = \
@@ -57,19 +57,26 @@ def create_an_office():
     if auth_header is not None:
         access_token = auth_header.split(" ")[1]
         decoded_token = ValidationHelper.decode_token(access_token)
+        admin_record = DatabaseManager().\
+            fetch_a_record_by_id_from_a_table("users", "is_admin", True)
 
         if not isinstance(decoded_token, str):
             office_reg_data = request.get_json(force=True)
             sample_office = PoliticalOffices(office_reg_data)
 
-            if len(office_reg_data) > 2:
+            if DatabaseManager().is_admin(decoded_token) is False:
+                custom_response = jsonify({
+                    "status": 401,
+                    "message": "Only Admin can create an office"}), 401
+
+            elif len(office_reg_data) != 2:
                 custom_response = jsonify(
-                    sample_office.more_data_fields_response), 400
-            elif len(office_reg_data) < 2:
-                custom_response = jsonify(
-                    sample_office.few_data_fields_response), 400
+                    sample_office.invalid_office_creation_data_fields_response
+                ), 400
+
             elif sample_office.validate_office_reg_data() is None:
                 custom_response = jsonify(sample_office.create_office()), 201
+
             else:
                 custom_response = sample_office.validate_office_reg_data()
 
@@ -83,8 +90,8 @@ def create_an_office():
     return custom_response
 
 
-@OFFICE_BP_V2.route("/<int:oid>", methods=["GET"])
-def office_fetch(oid):
+@OFFICE_BP_V2.route("/<int:office_id>", methods=["GET"])
+def office_fetch(office_id):
     """Fetch political office by ID """
     custom_response = None
     auth_header = request.headers.get('Authorization')
@@ -93,16 +100,16 @@ def office_fetch(oid):
         decoded_token = ValidationHelper.decode_token(access_token)
 
         if not isinstance(decoded_token, str):
-            if oid >= 1:
+            if office_id >= 1:
                 if DatabaseManager().\
                     lookup_whether_entity_exists_in_a_table_by_attrib(
-                "offices", "oid", oid) is True:
+                        "offices", "office_id", office_id) is True:
                     raw_office = DatabaseManager().\
                         fetch_a_record_by_id_from_a_table(
-                            "offices", "oid", oid
+                            "offices", "office_id", office_id
                     )
                     office = {}
-                    office["Office ID"] = raw_office[0]["oid"]
+                    office["Office ID"] = raw_office[0]["office_id"]
                     office["Office Name"] = raw_office[0]["name"]
                     office["Office Type"] = raw_office[0]["type"]
                     office["Registration Timestamp"] = \

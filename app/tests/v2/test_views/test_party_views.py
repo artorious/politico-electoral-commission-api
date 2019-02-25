@@ -81,7 +81,7 @@ class TestPartyCreation(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Bad Query - More data fields than expected",
+            "Invalid user input data (Party creation data fields). Expected fields for 'name', 'hq_address' and 'logo_url'. Please try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -104,7 +104,7 @@ class TestPartyCreation(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Bad Query - Fewer data fields than expected",
+            "Invalid user input data (Party creation data fields). Expected fields for 'name', 'hq_address' and 'logo_url'. Please try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -137,7 +137,8 @@ class TestPartyCreation(TestPartiesRoutes):
             msg="response code SHOULD BE 422 (Unprocessable Entity) + msg"
         )
         self.assertEqual(
-            deserialized_response["error"], "Empty data field",
+            deserialized_response["error"],
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -152,7 +153,8 @@ class TestPartyCreation(TestPartiesRoutes):
             msg="response code SHOULD BE 422 (Unprocessable Entity) + msg"
         )
         self.assertEqual(
-            deserialized_response["error"], "Empty data field",
+            deserialized_response["error"],
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -167,7 +169,8 @@ class TestPartyCreation(TestPartiesRoutes):
             msg="response code SHOULD BE 422 (Unprocessable Entity) + msg"
         )
         self.assertEqual(
-            deserialized_response["error"], "Empty data field",
+            deserialized_response["error"],
+            "Empty data field detected. User input cannot be an empty string",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -192,7 +195,7 @@ class TestPartyCreation(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Unprocessable Entity - Invalid value in data field",
+            "Unexpected data type detected in user input. Expected strings only",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -226,7 +229,7 @@ class TestPartyCreation(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Party already exists",
+            "Party registration conflict - Party name provided is already registered with another party",
             msg="Response Body Contents- Should be custom message "
         )
     def test_party_creation_with_already_existing_party_logo(self):
@@ -259,7 +262,7 @@ class TestPartyCreation(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Logo already in use",
+            "Party registration conflict - Logo provided is already registered with another party",
             msg="Response Body Contents- Should be custom message "
         )
     def test_party_creation_with_already_existing_party_hq(self):
@@ -293,7 +296,7 @@ class TestPartyCreation(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Conflict - Address already in use",
+            "Party registration conflict - Address provided is already registered with another party",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -331,7 +334,7 @@ class TestFetchingParty(TestPartiesRoutes):
             msg="Response Body Contents- Should be custom message "
         )
 
-    def test_fetching_a_party_with_a_valid_id_that_is_out_of_bound(self):
+    def test_fetching_a_party_with_id_that_is_out_of_range(self):
         """ Test with a integer that is out of Range"""
 
         response = self.client().get("/api/v2/parties/1000", headers=self.updated_header)
@@ -342,7 +345,7 @@ class TestFetchingParty(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Entity not in server. ID out of range.",
+            "Party ID requested not in server. ID out of range.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -419,7 +422,7 @@ class TestDeleteParty(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Entity not in server. ID out of range.",
+            "Party ID requested not in server. ID out of range.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -500,7 +503,7 @@ class TestEditParty(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Entity not in server. ID out of range.",
+            "Party ID requested not in server. ID out of range.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -608,7 +611,7 @@ class TestEditParty(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            "Bad Query - More data fields than expected",
+            "Invalid user input data (Party name edit field). Expected field for 'name' only. Please try again.",
             msg="Response Body Contents- Should be custom message "
         )
 
@@ -635,7 +638,7 @@ class TestEditParty(TestPartiesRoutes):
         )
         self.assertEqual(
             deserialized_response["error"],
-            'ID cannot be zero or negative',
+            'Party ID cannot be zero or negative. Please try again',
             msg="Response Body Contents- Should be custom message "
         )
 
