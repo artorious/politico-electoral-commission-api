@@ -17,8 +17,8 @@ class DatabaseManager:
             lastname VARCHAR(50) NOT NULL, \
             othername VARCHAR(50) NOT NULL, \
             email VARCHAR(50) UNIQUE NOT NULL, \
-            telephone VARCHAR(50) UNIQUE NOT NULL, \
-            passport_url TEXT UNIQUE NOT NULL, \
+            telephone VARCHAR(50) NOT NULL, \
+            passport_url TEXT NOT NULL, \
             registration_timestamp VARCHAR(50) NOT NULL, \
             last_login_timestamp VARCHAR(50) NOT NULL, \
             is_admin BOOLEAN NOT NULL, \
@@ -91,14 +91,22 @@ class DatabaseManager:
         self.cursor.execute(self.votes_table_query)
         self.cursor.execute(self.petitions_table_query)
         time_obj = time.localtime(time.time())
-        self.cursor.execute("""
+
+
+        try:
+            self.cursor.execute("""
             INSERT INTO users (user_id, firstname, lastname, othername,
             email, telephone, passport_url,registration_timestamp,
             last_login_timestamp, is_admin, password)
-            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
+            VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT(email) DO NOTHING;""", (
                 "Arthur", "Ngondo", "ngondez", os.getenv("ADMIN_EMAIL"),
                 "0727212166", "images/arthr.png", time.asctime(time_obj),
                 "Not logged in Yet", True, os.getenv("DEFAULT_ADMIN_PASS")))
+
+        except psycopg2.DatabaseError as err:
+            self.db_error_handler(err)
+
         print("Tables Created Succesfully")
 
     def fetch_all_records_in_a_table(self, table):
