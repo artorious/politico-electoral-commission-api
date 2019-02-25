@@ -10,8 +10,8 @@ A web application platform which both the politicians and citizens can use. Poli
 
 ## Endpoints - Features
 
-**Endpoint** | **Request**| **Description** 
---- | --- | --- | --- 
+**Endpoint** | **Request**| **Description**
+--- | --- | ---
 `/api/v2/auth/signup`|`POST`| User signup (Available to all users) 
 `/api/v2/auth/login`|`POST`| User Login (Available to all users)
 `/api/v2/parties` | `POST` | Create a political party (Available to all users)
