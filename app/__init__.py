@@ -34,7 +34,7 @@ def server_side_error(err):
     }), 500
 
 
-def create_app(config_mode):
+def create_app(config_mode="development"):
     """App factory """
     app = Flask(__name__, instance_relative_config=True)
     # config file loading
