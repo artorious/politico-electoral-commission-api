@@ -38,7 +38,7 @@ def create_app(config_mode="development"):
     """App factory """
     app = Flask(__name__, instance_relative_config=True)
     # config file loading
-    app.config.from_object(app_config[config_mode])
+    app.config.from_object(app_config["development"])
     app.config.from_pyfile('config.py')
     # local imports
     from app.api.v1.views import party_views as parties_v1
