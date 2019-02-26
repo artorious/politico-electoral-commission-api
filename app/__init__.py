@@ -69,7 +69,7 @@ def create_app(config_mode="development"):
     @app.route("/")
     def home():
         """ Home - Docs"""
-        return redirect("https://documenter.getpostman.com/view/3796196/RztspSTt", code=302)
+        return redirect("https://app.swaggerhub.com/apis-docs/artorious8/politico-v_2/1.0-oas3", code=302)
 
     return app
 
